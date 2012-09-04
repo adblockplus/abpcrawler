@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+
+<!-- This Source Code is subject to the terms of the Mozilla Public License
+   - version 2.0 (the "License"). You can obtain a copy of the License at
+   - http://mozilla.org/MPL/2.0/. -->
+
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://abpcrawlaer/skin/crawler.css" type="text/css"?>
+
+<!DOCTYPE dialog SYSTEM "chrome://abpcrawler/locale/crawler.dtd">
+
+<dialog id="abpcrawler-crawler"
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+    title="&dialog.title;"
+    onload="init()"
+    onunload="destroy()"
+    buttons="accept"
+    buttonlabelaccept="&accept.label;"
+    buttonaccesskeyaccept="&accept.accesskey;"
+    width="600px"
+    height="400px"
+    persist="screenX screenY width height sizemode advancedMode"
+    windowtype="abpcrawler:crawl">
+
+  <script type="application/x-javascript;version=1.7" src="crawler.js"/>
+
+  <stringbundleset id="stringbundles">
+    <stringbundle id="stringbundle-global" src="chrome://abpcrawler/locale/global.properties"/>
+  </stringbundleset>
+
+  <description id="introduction">&introduction;</description>
+</dialog>
