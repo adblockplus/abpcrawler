@@ -96,13 +96,8 @@ function destroy()
     Policy.processNode = origProcessNode;
 }
 
-function crawl()
+function loadUrl(url)
 {
-  // TODO: Don't hard code the urls
-  let urls = ["http://www.heise.de", "http://stackoverflow.com"];
-  for (let i = 0; i < urls.length; i++)
-  {
-    let url = urls[i];
     let tab = window.opener.gBrowser.addTab(url);
     let progressListener = {
       onStateChange: function(aBrowser, aWebProgress, aRequest, aStateFlags, aStatus)
@@ -115,5 +110,12 @@ function crawl()
       }    
     }
     window.opener.gBrowser.addTabsProgressListener(progressListener);    
-  };
+}
+
+function crawl()
+{
+  // TODO: Get URLs from the server
+  let urls = ["http://www.heise.de", "http://stackoverflow.com"];
+  for (let i = 0; i < urls.length; i++)
+    loadUrl(urls[i]);
 }
