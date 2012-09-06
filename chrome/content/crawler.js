@@ -98,14 +98,6 @@ function destroy()
 
 function crawl()
 {
-  let prefs = Components.classes["@mozilla.org/preferences-service;1"]
-      .getService(Components.interfaces.nsIPrefService)
-      .getBranch("extensions.adblockplus.");
-  let abpEnabled = prefs.getBoolPref("enabled");
-
-  if (!abpEnabled)
-    prefs.setBoolPref("enabled", true);
-
   // TODO: Don't hard code the urls
   let urls = ["http://www.heise.de", "http://stackoverflow.com"];
   for (let i = 0; i < urls.length; i++)
@@ -120,9 +112,6 @@ function crawl()
 
         window.opener.gBrowser.removeTabsProgressListener(progressListener);
         window.opener.gBrowser.removeTab(tab);
-
-        if (!abpEnabled)
-          prefs.setBoolPref("enabled", false);
       }    
     }
     window.opener.gBrowser.addTabsProgressListener(progressListener);    
