@@ -106,21 +106,25 @@ function crawl()
   if (!abpEnabled)
     prefs.setBoolPref("enabled", true);
 
-  // TODO: Don't hard code the site
-  let tab = window.opener.gBrowser.addTab("http://www.heise.de");
-  let progressListener =
+  // TODO: Don't hard code the urls
+  let urls = ["http://www.heise.de", "http://stackoverflow.com"];
+  for (let i = 0; i < urls.length; i++)
   {
-    onStateChange: function(aBrowser, aWebProgress, aRequest, aStateFlags, aStatus)
-    {
-      if (!(aStateFlags & Components.interfaces.nsIWebProgressListener.STATE_STOP && aStatus === 0))
-        return;
+    let url = urls[i];
+    let tab = window.opener.gBrowser.addTab(url);
+    let progressListener = {
+      onStateChange: function(aBrowser, aWebProgress, aRequest, aStateFlags, aStatus)
+      {
+        if (!(aStateFlags & Components.interfaces.nsIWebProgressListener.STATE_STOP && aStatus === 0))
+          return;
 
-      window.opener.gBrowser.removeTabsProgressListener(progressListener);
-      window.opener.gBrowser.removeTab(tab);
+        window.opener.gBrowser.removeTabsProgressListener(progressListener);
+        window.opener.gBrowser.removeTab(tab);
 
-      if (!abpEnabled)
-        prefs.setBoolPref("enabled", false);
-    }    
+        if (!abpEnabled)
+          prefs.setBoolPref("enabled", false);
+      }    
+    }
+    window.opener.gBrowser.addTabsProgressListener(progressListener);    
   };
-  window.opener.gBrowser.addTabsProgressListener(progressListener);
 }
