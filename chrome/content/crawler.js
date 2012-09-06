@@ -4,6 +4,7 @@
  * http://mozilla.org/MPL/2.0/.
  */
 
+const Cc = Components.classes;
 const Ci = Components.interfaces;
 const Cu = Components.utils;
 
@@ -96,6 +97,20 @@ function destroy()
     Policy.processNode = origProcessNode;
 }
 
+function fetchCrawlableUrls(callback)
+{
+  let request = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Ci.nsIXMLHttpRequest);
+  request.mozBackgroundRequest = true;
+  // TODO: Don't hard code the request URL
+  request.open("GET", "http://localhost:5000/crawlableUrls");
+  request.addEventListener("load", function()
+  {
+    let urls = request.responseText.trim().split("\n");
+    callback(urls);
+  });
+  request.send();
+}
+
 function loadUrl(url)
 {
     let tab = window.opener.gBrowser.addTab(url);
@@ -114,8 +129,9 @@ function loadUrl(url)
 
 function crawl()
 {
-  // TODO: Get URLs from the server
-  let urls = ["http://www.heise.de", "http://stackoverflow.com"];
-  for (let i = 0; i < urls.length; i++)
-    loadUrl(urls[i]);
+  fetchCrawlableUrls(function(urls)
+  {
+    for (let i = 0; i < urls.length; i++)
+      loadUrl(urls[i]);
+  });
 }
