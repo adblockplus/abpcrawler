@@ -30,6 +30,11 @@
     <stringbundle id="stringbundle-global" src="chrome://abpcrawler/locale/global.properties"/>
   </stringbundleset>
 
+  <vbox>
+      <label control="backend-url" value="Backend URL:"/>
+      <textbox id="backend-url" value="https://adblockplus.org"/>
+  </vbox>
+
   <tree id="list" flex="1">
     <treecols>
       <treecol id="location" label="&location.column;" flex="1" primary="true" persist="width ordinal sortDirection hidden"/>
