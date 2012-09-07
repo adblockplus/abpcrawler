@@ -97,12 +97,11 @@ function destroy()
     Policy.processNode = origProcessNode;
 }
 
-function fetchCrawlableUrls(callback)
+function fetchCrawlableUrls(backendUrl, callback)
 {
   let request = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Ci.nsIXMLHttpRequest);
   request.mozBackgroundRequest = true;
-  // TODO: Don't hard code the request URL
-  request.open("GET", "http://localhost:5000/crawlableUrls");
+  request.open("GET", backendUrl + "/crawlableUrls");
   request.addEventListener("load", function()
   {
     let urls = request.responseText.trim().split("\n");
@@ -129,7 +128,9 @@ function loadUrl(url)
 
 function crawl()
 {
-  fetchCrawlableUrls(function(urls)
+  let backendUrlTextBox = document.getElementById("backend-url");
+  let backendUrl = backendUrlTextBox.value;
+  fetchCrawlableUrls(backendUrl, function(urls)
   {
     for (let i = 0; i < urls.length; i++)
       loadUrl(urls[i]);
