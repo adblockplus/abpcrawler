@@ -3,4 +3,5 @@
 <!ENTITY accept.accesskey   "l">
 <!ENTITY crawl.label        "Crawl">
 <!ENTITY crawl.accesskey    "c">
-<!ENTITY location.column    "Location">
+<!ENTITY site.column        "Site">
+<!ENTITY requestUrl.column  "Request URL">
