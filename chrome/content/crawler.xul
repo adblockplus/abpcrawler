@@ -34,12 +34,4 @@
       <label control="backend-url" value="Backend URL:"/>
       <textbox id="backend-url" value="https://adblockplus.org"/>
   </vbox>
-
-  <tree id="list" flex="1">
-    <treecols>
-      <treecol id="site" label="&site.column;" flex="1" primary="true" persist="width ordinal sortDirection hidden"/>
-      <treecol id="request-url" label="&requestUrl.column;" flex="1" primary="true" persist="width ordinal sortDirection hidden"/>
-    </treecols>
-    <treechildren/>
-  </tree>
 </dialog>
