@@ -47,13 +47,17 @@ else
 let origShouldLoad = PolicyPrivate.shouldLoad;
 let origProcessNode = Policy.processNode;
 
-function appendBlocked(url)
+function appendBlocked(site, requestUrl)
 {
-  let treeCell = document.createElement("treecell");
-  treeCell.setAttribute("label", url);
+  let siteCell = document.createElement("treecell");
+  siteCell.setAttribute("label", site);
+
+  let requestUrlCell = document.createElement("treecell");
+  requestUrlCell.setAttribute("label", requestUrl);
 
   let treeRow = document.createElement("treerow");
-  treeRow.appendChild(treeCell);
+  treeRow.appendChild(siteCell);
+  treeRow.appendChild(requestUrlCell);
 
   let treeItem = document.createElement("treeitem");
   treeItem.appendChild(treeRow);
@@ -63,23 +67,26 @@ function appendBlocked(url)
   treeChildren.appendChild(treeItem);
 }
 
-function handleNode(result, location)
+function handleNode(result, location, site)
 {
   if (result === Ci.nsIContentPolicy.REJECT_REQUEST)
-    appendBlocked(location.spec);
+    // TODO: Send to backend instead of displaying
+    appendBlocked(site, location.spec);
 }
 
 function shouldLoad(contentType, contentLocation, requestOrigin, node, mimeTypeGuess, extra)
 {
   let result = origShouldLoad.apply(this, arguments);
-  handleNode(result, contentLocation);
+  handleNode(result, contentLocation, requestOrigin.spec);
   return result;
 }
 
 function processNode(wnd, node, contentType, location, collapse)
 {
   let result = origProcessNode.apply(this, arguments);
-  handleNode(result, location);
+  // TODO: Get the site
+  Application.console.log(node);
+  handleNode(result, location, "Unknown");
   return result;
 }
 
