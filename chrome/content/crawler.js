@@ -47,31 +47,33 @@ else
 let origShouldLoad = PolicyPrivate.shouldLoad;
 let origProcessNode = Policy.processNode;
 
-function appendBlocked(site, requestUrl)
+let backendUrl;
+let crawlerRunId;
+
+function get(url, callback)
 {
-  let siteCell = document.createElement("treecell");
-  siteCell.setAttribute("label", site);
+  let request = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Ci.nsIXMLHttpRequest);
+  request.mozBackgroundRequest = true;
+  request.open("GET", url);
+  if (callback)
+    request.addEventListener("load", function()
+    {
+      callback(request);
+    });
+  request.send();
+}
 
-  let requestUrlCell = document.createElement("treecell");
-  requestUrlCell.setAttribute("label", requestUrl);
-
-  let treeRow = document.createElement("treerow");
-  treeRow.appendChild(siteCell);
-  treeRow.appendChild(requestUrlCell);
-
-  let treeItem = document.createElement("treeitem");
-  treeItem.appendChild(treeRow);
-
-  let list = document.getElementById("list");
-  let treeChildren = list.getElementsByTagName("treechildren")[0];
-  treeChildren.appendChild(treeItem);
+function sendCrawlerData(site, url)
+{
+  let requestUrl = backendUrl + "/crawlerData?run=" + crawlerRunId +
+      "&site=" + encodeURIComponent(site) + "&url=" + encodeURIComponent(url);
+  get(requestUrl);
 }
 
 function handleNode(result, location, site)
 {
   if (result === Ci.nsIContentPolicy.REJECT_REQUEST)
-    // TODO: Send to backend instead of displaying
-    appendBlocked(site, location.spec);
+    sendCrawlerData(site, location.spec);
 }
 
 function shouldLoad(contentType, contentLocation, requestOrigin, node, mimeTypeGuess, extra)
@@ -104,17 +106,21 @@ function destroy()
     Policy.processNode = origProcessNode;
 }
 
-function fetchCrawlableUrls(backendUrl, callback)
+function fetchCrawlableUrls(callback)
 {
-  let request = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Ci.nsIXMLHttpRequest);
-  request.mozBackgroundRequest = true;
-  request.open("GET", backendUrl + "/crawlableUrls");
-  request.addEventListener("load", function()
+  get(backendUrl + "/crawlableUrls", function(request)
   {
     let urls = request.responseText.trim().split("\n");
     callback(urls);
   });
-  request.send();
+}
+
+function initCrawlerRun(callback)
+{
+  get(backendUrl + "/crawlerRun", function(request)
+  {
+    callback(request.responseText);
+  });
 }
 
 function loadUrl(url)
@@ -136,10 +142,14 @@ function loadUrl(url)
 function crawl()
 {
   let backendUrlTextBox = document.getElementById("backend-url");
-  let backendUrl = backendUrlTextBox.value;
-  fetchCrawlableUrls(backendUrl, function(urls)
+  backendUrl = backendUrlTextBox.value;
+  fetchCrawlableUrls(function(urls)
   {
-    for (let i = 0; i < urls.length; i++)
-      loadUrl(urls[i]);
+    initCrawlerRun(function(runId)
+    {
+      crawlerRunId = runId;
+      for (let i = 0; i < urls.length; i++)
+        loadUrl(urls[i]);
+    });
   });
 }
