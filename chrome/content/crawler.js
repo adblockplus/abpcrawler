@@ -64,17 +64,19 @@ function get(url, callback)
   request.send();
 }
 
-function sendCrawlerData(url)
+function sendCrawlerData(url, filtered)
 {
   let requestUrl = backendUrl + "/crawlerData?run=" + crawlerRunId + "&site=" +
-      encodeURIComponent(currentSite) + "&url=" + encodeURIComponent(url);
+      encodeURIComponent(currentSite) + "&url=" + encodeURIComponent(url) +
+      "&filtered=" + filtered;
   get(requestUrl);
 }
 
 function handleNode(result, location)
 {
-  if (result === Ci.nsIContentPolicy.REJECT_REQUEST)
-    sendCrawlerData(location.spec);
+  let url = location.spec;
+  let filtered = result === Ci.nsIContentPolicy.REJECT_REQUEST;
+  sendCrawlerData(url, filtered);
 }
 
 function shouldLoad(contentType, contentLocation, requestOrigin, node, mimeTypeGuess, extra)
