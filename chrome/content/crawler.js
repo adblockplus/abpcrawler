@@ -123,7 +123,7 @@ function initCrawlerRun(callback)
   });
 }
 
-function loadUrl(url)
+function loadUrl(url, callback)
 {
     let tab = window.opener.gBrowser.addTab(url);
     let progressListener = {
@@ -134,9 +134,21 @@ function loadUrl(url)
 
         window.opener.gBrowser.removeTabsProgressListener(progressListener);
         window.opener.gBrowser.removeTab(tab);
+        callback();
       }    
     }
     window.opener.gBrowser.addTabsProgressListener(progressListener);    
+}
+
+function loadUrls(urls)
+{
+  if (!urls.length)
+    return;
+
+  loadUrl(urls[0], function()
+  {
+    loadUrls(urls.slice(1));
+  });
 }
 
 function crawl()
@@ -148,8 +160,7 @@ function crawl()
     initCrawlerRun(function(runId)
     {
       crawlerRunId = runId;
-      for (let i = 0; i < urls.length; i++)
-        loadUrl(urls[i]);
+      loadUrls(urls);
     });
   });
 }
