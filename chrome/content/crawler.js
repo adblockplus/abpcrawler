@@ -49,6 +49,7 @@ let origProcessNode = Policy.processNode;
 
 let backendUrl;
 let crawlerRunId;
+let currentSite;
 
 function get(url, callback)
 {
@@ -63,32 +64,30 @@ function get(url, callback)
   request.send();
 }
 
-function sendCrawlerData(site, url)
+function sendCrawlerData(url)
 {
-  let requestUrl = backendUrl + "/crawlerData?run=" + crawlerRunId +
-      "&site=" + encodeURIComponent(site) + "&url=" + encodeURIComponent(url);
+  let requestUrl = backendUrl + "/crawlerData?run=" + crawlerRunId + "&site=" +
+      encodeURIComponent(currentSite) + "&url=" + encodeURIComponent(url);
   get(requestUrl);
 }
 
-function handleNode(result, location, site)
+function handleNode(result, location)
 {
   if (result === Ci.nsIContentPolicy.REJECT_REQUEST)
-    sendCrawlerData(site, location.spec);
+    sendCrawlerData(location.spec);
 }
 
 function shouldLoad(contentType, contentLocation, requestOrigin, node, mimeTypeGuess, extra)
 {
   let result = origShouldLoad.apply(this, arguments);
-  handleNode(result, contentLocation, requestOrigin.spec);
+  handleNode(result, contentLocation);
   return result;
 }
 
 function processNode(wnd, node, contentType, location, collapse)
 {
   let result = origProcessNode.apply(this, arguments);
-  // TODO: Get the site
-  Application.console.log(node);
-  handleNode(result, location, "Unknown");
+  handleNode(result, location);
   return result;
 }
 
@@ -106,12 +105,12 @@ function destroy()
     Policy.processNode = origProcessNode;
 }
 
-function fetchCrawlableUrls(callback)
+function fetchCrawlableSites(callback)
 {
   get(backendUrl + "/crawlableUrls", function(request)
   {
-    let urls = request.responseText.trim().split("\n");
-    callback(urls);
+    let sites = request.responseText.trim().split("\n");
+    callback(sites);
   });
 }
 
@@ -123,31 +122,32 @@ function initCrawlerRun(callback)
   });
 }
 
-function loadUrl(url, callback)
+function loadSite(site, callback)
 {
-    let tab = window.opener.gBrowser.addTab(url);
-    let progressListener = {
-      onStateChange: function(aBrowser, aWebProgress, aRequest, aStateFlags, aStatus)
-      {
-        if (!(aStateFlags & Components.interfaces.nsIWebProgressListener.STATE_STOP && aStatus === 0))
-          return;
+  currentSite = site;
+  let tab = window.opener.gBrowser.addTab(site);
+  let progressListener = {
+    onStateChange: function(aBrowser, aWebProgress, aRequest, aStateFlags, aStatus)
+    {
+      if (!(aStateFlags & Components.interfaces.nsIWebProgressListener.STATE_STOP && aStatus === 0))
+        return;
 
-        window.opener.gBrowser.removeTabsProgressListener(progressListener);
-        window.opener.gBrowser.removeTab(tab);
-        callback();
-      }    
-    }
-    window.opener.gBrowser.addTabsProgressListener(progressListener);    
+      window.opener.gBrowser.removeTabsProgressListener(progressListener);
+      window.opener.gBrowser.removeTab(tab);
+      callback();
+    }    
+  }
+  window.opener.gBrowser.addTabsProgressListener(progressListener);    
 }
 
-function loadUrls(urls)
+function loadSites(sites)
 {
-  if (!urls.length)
+  if (!sites.length)
     return;
 
-  loadUrl(urls[0], function()
+  loadSite(sites[0], function()
   {
-    loadUrls(urls.slice(1));
+    loadSites(sites.slice(1));
   });
 }
 
@@ -155,12 +155,12 @@ function crawl()
 {
   let backendUrlTextBox = document.getElementById("backend-url");
   backendUrl = backendUrlTextBox.value;
-  fetchCrawlableUrls(function(urls)
+  fetchCrawlableSites(function(sites)
   {
     initCrawlerRun(function(runId)
     {
       crawlerRunId = runId;
-      loadUrls(urls);
+      loadSites(sites);
     });
   });
 }
