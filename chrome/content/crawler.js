@@ -28,7 +28,7 @@ let origProcessNode = Policy.processNode;
 
 let backendUrl;
 let crawlerRunId;
-let currentSite;
+let siteTabs = {};
 
 function get(url, callback)
 {
@@ -43,10 +43,10 @@ function get(url, callback)
   request.send();
 }
 
-function sendCrawlerData(url, filtered)
+function sendCrawlerData(url, filtered, site)
 {
   let requestUrl = backendUrl + "/crawlerData?run=" + crawlerRunId + "&site=" +
-      encodeURIComponent(currentSite) + "&url=" + encodeURIComponent(url) +
+      encodeURIComponent(site) + "&url=" + encodeURIComponent(url) +
       "&filtered=" + filtered;
   get(requestUrl);
 }
@@ -56,7 +56,11 @@ function processNode(wnd, node, contentType, location, collapse)
   let result = origProcessNode.apply(this, arguments);
   let url = location.spec;
   if (url)
-    sendCrawlerData(url, !result);
+  {
+    let filtered = !result;
+    let site = siteTabs[wnd.top.document];
+    sendCrawlerData(url, filtered, site);
+  }
   return result;
 }
 
@@ -90,8 +94,10 @@ function initCrawlerRun(callback)
 
 function loadSite(site, callback)
 {
-  currentSite = site;
-  let tab = window.opener.gBrowser.addTab(site);
+  let tabbrowser = window.opener.gBrowser;
+  let tab = tabbrowser.addTab(site);
+  let tabDocument = tabbrowser.getBrowserForTab(tab).contentDocument;
+  siteTabs[tabDocument] = site;
   let progressListener = {
     onStateChange: function(aBrowser, aWebProgress, aRequest, aStateFlags, aStatus)
     {
