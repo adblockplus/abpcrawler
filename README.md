@@ -11,7 +11,7 @@ Make sure you have:
 
 * A running Firefox with Adblock Plus and
   [Extension Auto Installer](https://addons.mozilla.org/en-US/firefox/addon/autoinstaller/)
-  installed.
+  installed
 * Python 2.7
 
 Then execute the following:
