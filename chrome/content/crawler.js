@@ -28,7 +28,7 @@ let origProcessNode = Policy.processNode;
 
 let backendUrl;
 let crawlerRunId;
-let siteTabs = {};
+let siteTabs;
 
 function get(url, callback)
 {
@@ -125,6 +125,7 @@ function loadSites(sites)
 
 function crawl()
 {
+  siteTabs = {};
   let backendUrlTextBox = document.getElementById("backend-url");
   backendUrl = backendUrlTextBox.value;
   fetchCrawlableSites(function(sites)
