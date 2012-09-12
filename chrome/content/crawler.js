@@ -29,6 +29,7 @@ let origProcessNode = Policy.processNode;
 let backendUrl;
 let crawlerRunId;
 let siteTabs;
+let currentTabs;
 
 function get(url, callback)
 {
@@ -114,18 +115,24 @@ function loadSite(site, callback)
 
 function loadSites(sites)
 {
-  if (!sites.length)
-    return;
-
-  loadSite(sites[0], function()
+  let parallelTabs = 5; // TODO: Make this configurable
+  while (currentTabs < parallelTabs && sites.length)
   {
-    loadSites(sites.slice(1));
-  });
+    currentTabs++;
+    let site = sites[0];
+    sites = sites.slice(1);
+    loadSite(site, function()
+    {
+      currentTabs--;
+      loadSites(sites);
+    });
+  }
 }
 
 function crawl()
 {
   siteTabs = {};
+  currentTabs = 0;
   let backendUrlTextBox = document.getElementById("backend-url");
   backendUrl = backendUrlTextBox.value;
   fetchCrawlableSites(function(sites)
