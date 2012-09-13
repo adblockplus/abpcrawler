@@ -78,7 +78,7 @@ function destroy()
 
 function fetchCrawlableSites(callback)
 {
-  get(backendUrl + "/crawlableUrls", function(request)
+  get(backendUrl + "/crawlableSites", function(request)
   {
     let sites = request.responseText.trim().split("\n");
     callback(sites);
