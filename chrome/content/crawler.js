@@ -8,6 +8,7 @@ const Cc = Components.classes;
 const Ci = Components.interfaces;
 const Cu = Components.utils;
 
+Cu.import("resource://gre/modules/FileUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 
 function abprequire(module)
@@ -26,30 +27,42 @@ let {Filter} = abprequire("filterClasses");
 
 let origProcessNode = Policy.processNode;
 
-let backendUrl;
-let crawlerRunId;
 let siteTabs;
 let currentTabs;
+let backendUrl;
+let crawlerDataFile;
+let crawlerDataOutputStream;
 
-function get(url, callback)
+function getBackendUrl()
 {
-  let request = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Ci.nsIXMLHttpRequest);
-  request.mozBackgroundRequest = true;
-  request.open("GET", url);
-  if (callback)
-    request.addEventListener("load", function()
-    {
-      callback(request);
-    });
-  request.send();
+  let backendUrlTextBox = document.getElementById("backend-url");
+  return backendUrlTextBox.value;
 }
 
-function sendCrawlerData(url, filtered, site)
+function createTemporaryFile(name)
 {
-  let requestUrl = backendUrl + "/crawlerData?run=" + crawlerRunId + "&site=" +
-      encodeURIComponent(site) + "&url=" + encodeURIComponent(url) +
-      "&filtered=" + filtered;
-  get(requestUrl);
+  let file = FileUtils.getFile("TmpD", [name]);
+  file.createUnique(Components.interfaces.nsIFile.NORMAL_FILE_TYPE,
+                    FileUtils.PERMS_FILE);
+  return file;
+}
+
+function openOutputStream(file)
+{
+  let outputStream = Cc["@mozilla.org/network/file-output-stream;1"]
+      .createInstance(Components.interfaces.nsIFileOutputStream);
+  let flags = FileUtils.MODE_WRONLY | FileUtils.MODE_APPEND;
+  outputStream.init(crawlerDataFile, flags, 0666, 0); 
+  let converterOutputStream = Cc["@mozilla.org/intl/converter-output-stream;1"]
+      .createInstance(Components.interfaces.nsIConverterOutputStream);
+  converterOutputStream.init(outputStream, "UTF-8", 0, 0);
+  return converterOutputStream;
+}
+
+function storeCrawlerData(url, site, filtered)
+{
+  let data = JSON.stringify([url, site, filtered]) + "\n";
+  crawlerDataOutputStream.writeString(data);
 }
 
 function processNode(wnd, node, contentType, location, collapse)
@@ -58,9 +71,9 @@ function processNode(wnd, node, contentType, location, collapse)
   let url = location.spec;
   if (url)
   {
-    let filtered = !result;
     let site = siteTabs[wnd.top.document];
-    sendCrawlerData(url, filtered, site);
+    let filtered = !result;
+    storeCrawlerData(url, site, filtered);
   }
   return result;
 }
@@ -76,20 +89,26 @@ function destroy()
     Policy.processNode = origProcessNode;
 }
 
+function get(url, callback)
+{
+  let request = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"]
+      .createInstance(Ci.nsIXMLHttpRequest);
+  request.mozBackgroundRequest = true;
+  request.open("GET", url);
+  if (callback)
+    request.addEventListener("load", function()
+    {
+      callback(request);
+    });
+  request.send();
+}
+
 function fetchCrawlableSites(callback)
 {
   get(backendUrl + "/crawlableSites", function(request)
   {
     let sites = request.responseText.trim().split("\n");
     callback(sites);
-  });
-}
-
-function initCrawlerRun(callback)
-{
-  get(backendUrl + "/crawlerRun", function(request)
-  {
-    callback(request.responseText);
   });
 }
 
@@ -113,6 +132,32 @@ function loadSite(site, callback)
   window.opener.gBrowser.addTabsProgressListener(progressListener);    
 }
 
+function postFile(url, file, callback)
+{
+  let formData = new FormData();
+  formData.append("file", new File(file.path));
+
+  let request = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"]
+      .createInstance(Ci.nsIXMLHttpRequest);
+  request.mozBackgroundRequest = true;
+  request.open("POST", url);
+  if (callback)
+    request.addEventListener("load", function()
+    {
+      callback(request);
+    });
+  request.send(formData);
+}
+
+function sendCrawlerData()
+{
+  crawlerDataOutputStream.close();
+  postFile(backendUrl + "/crawlerData", crawlerDataFile, function()
+  {
+    crawlerDataFile.remove(true);
+  });
+}
+
 function loadSites(sites)
 {
   let parallelTabs = 5; // TODO: Make this configurable
@@ -124,7 +169,10 @@ function loadSites(sites)
     loadSite(site, function()
     {
       currentTabs--;
-      loadSites(sites);
+      if (!sites.length && !currentTabs)
+        sendCrawlerData();
+      else
+        loadSites(sites);
     });
   }
 }
@@ -133,14 +181,12 @@ function crawl()
 {
   siteTabs = {};
   currentTabs = 0;
-  let backendUrlTextBox = document.getElementById("backend-url");
-  backendUrl = backendUrlTextBox.value;
+  backendUrl = getBackendUrl();
+  crawlerDataFile = createTemporaryFile("crawler-data");
+  crawlerDataOutputStream = openOutputStream(crawlerDataFile);
+
   fetchCrawlableSites(function(sites)
   {
-    initCrawlerRun(function(runId)
-    {
-      crawlerRunId = runId;
-      loadSites(sites);
-    });
+    loadSites(sites);
   });
 }
