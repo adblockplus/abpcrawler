@@ -6,6 +6,4 @@ version=0.1
 author=Felix H. Dahlke
 
 [compat]
-firefox=8.0/18.0a1
-thunderbird=8.0/18.0a1
-seamonkey=2.5/2.15a1
+firefox=13.0/18.0a1
