@@ -128,7 +128,7 @@ function loadSite(site, callback)
       if (browser !== aBrowser)
         return;
 
-      if (!(aStateFlags & Ci.nsIWebProgressListener.STATE_STOP && aStatus === 0))
+      if (!(aStateFlags & Ci.nsIWebProgressListener.STATE_STOP))
         return;
 
       window.opener.gBrowser.removeTabsProgressListener(progressListener);
