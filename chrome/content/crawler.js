@@ -52,7 +52,7 @@ function openOutputStream(file)
   let outputStream = Cc["@mozilla.org/network/file-output-stream;1"]
       .createInstance(Components.interfaces.nsIFileOutputStream);
   let flags = FileUtils.MODE_WRONLY | FileUtils.MODE_APPEND;
-  outputStream.init(crawlerDataFile, flags, 0666, 0); 
+  outputStream.init(crawlerDataFile, flags, 666, 0); 
   let converterOutputStream = Cc["@mozilla.org/intl/converter-output-stream;1"]
       .createInstance(Components.interfaces.nsIConverterOutputStream);
   converterOutputStream.init(outputStream, "UTF-8", 0, 0);
