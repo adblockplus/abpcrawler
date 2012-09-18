@@ -114,6 +114,9 @@ function fetchCrawlableSites(callback)
 
 function loadSite(site, callback)
 {
+  if (!site)
+    return;
+
   let tabbrowser = window.opener.gBrowser;
   let tab = tabbrowser.addTab(site);
   let browser = tabbrowser.getBrowserForTab(tab);
