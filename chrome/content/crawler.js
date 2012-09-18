@@ -118,8 +118,6 @@ function loadSite(site, callback)
   let tab = tabbrowser.addTab(site);
   let browser = tabbrowser.getBrowserForTab(tab);
 
-  // TODO: Don't create multiple tabs progress listeners. Use one progress
-  //       listener per tab or a single tabs progress listener instead.
   let progressListener = {
     onStateChange: function(aBrowser, aWebProgress, aRequest, aStateFlags, aStatus)
     {
