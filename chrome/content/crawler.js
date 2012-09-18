@@ -72,10 +72,8 @@ function processNode(wnd, node, contentType, location, collapse)
   if (url)
   {
     let site = siteTabs[wnd.top.location.href];
-    Application.console.log("url: " + location.spec);
-    Application.console.log("site: " + site);
     let filtered = !result;
-    //storeCrawlerData(url, site, filtered);
+    storeCrawlerData(url, site, filtered);
   }
   return result;
 }
