@@ -71,9 +71,11 @@ function processNode(wnd, node, contentType, location, collapse)
   let url = location.spec;
   if (url)
   {
-    let site = siteTabs[wnd.top.document];
+    let site = siteTabs[wnd.top.location.href];
+    Application.console.log("url: " + location.spec);
+    Application.console.log("site: " + site);
     let filtered = !result;
-    storeCrawlerData(url, site, filtered);
+    //storeCrawlerData(url, site, filtered);
   }
   return result;
 }
@@ -116,20 +118,32 @@ function loadSite(site, callback)
 {
   let tabbrowser = window.opener.gBrowser;
   let tab = tabbrowser.addTab(site);
-  let tabDocument = tabbrowser.getBrowserForTab(tab).contentDocument;
-  siteTabs[tabDocument] = site;
+  let browser = tabbrowser.getBrowserForTab(tab);
+
+  // TODO: Don't create multiple tabs progress listeners. Use one progress
+  //       listener per tab or a single tabs progress listener instead.
   let progressListener = {
     onStateChange: function(aBrowser, aWebProgress, aRequest, aStateFlags, aStatus)
     {
-      if (!(aStateFlags & Components.interfaces.nsIWebProgressListener.STATE_STOP && aStatus === 0))
+      if (browser !== aBrowser)
+        return;
+
+      if (!(aStateFlags & Ci.nsIWebProgressListener.STATE_STOP && aStatus === 0))
         return;
 
       window.opener.gBrowser.removeTabsProgressListener(progressListener);
       window.opener.gBrowser.removeTab(tab);
       callback();
-    }    
-  }
-  window.opener.gBrowser.addTabsProgressListener(progressListener);    
+    },
+    onLocationChange: function(aBrowser, aWebProgress, aRequest, aLocation, aFlags)
+    {
+      // TODO: This is a bit of a hack, try to use a WeakMap with browser and
+      //       getChromeWindow().gBrowser.getBrowserForDocument() instead.
+      if (browser === aBrowser)
+        siteTabs[aLocation.spec] = site;
+    }
+  };
+  tabbrowser.addTabsProgressListener(progressListener);    
 }
 
 function postFile(url, file, callback)
