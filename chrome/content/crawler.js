@@ -136,8 +136,6 @@ function loadSite(site, callback)
     },
     onLocationChange: function(aBrowser, aWebProgress, aRequest, aLocation, aFlags)
     {
-      // TODO: This is a bit of a hack, try to use a WeakMap with browser and
-      //       getChromeWindow().gBrowser.getBrowserForDocument() instead.
       if (browser === aBrowser)
         siteTabs[aLocation.spec] = site;
     }
