@@ -11,8 +11,6 @@
 <dialog id="abpcrawler-crawler"
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
     title="&dialog.title;"
-    onload="init()"
-    onunload="destroy()"
     ondialogextra2="crawl()"
     buttons="accept,extra2"
     buttonlabelaccept="&accept.label;"
@@ -32,6 +30,6 @@
 
   <vbox>
       <label control="backend-url" value="Backend URL:"/>
-      <textbox id="backend-url" value="https://adblockplus.org"/>
+      <textbox id="backend-url" value="https://www.adblockplus.org"/>
   </vbox>
 </dialog>
