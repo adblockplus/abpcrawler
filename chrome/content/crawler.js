@@ -28,4 +28,5 @@ function crawl()
 {
   let backendUrl = getBackendUrl();
   Crawler.crawl(backendUrl, 5, window.opener);
+  return false;
 }
