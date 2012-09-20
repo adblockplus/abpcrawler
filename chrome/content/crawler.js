@@ -27,5 +27,5 @@ function getBackendUrl()
 function crawl()
 {
   let backendUrl = getBackendUrl();
-  Crawler.crawl(backendUrl);
+  Crawler.crawl(backendUrl, 5, window.opener);
 }
