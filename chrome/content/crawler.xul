@@ -24,10 +24,6 @@
 
   <script type="application/x-javascript;version=1.7" src="crawler.js"/>
 
-  <stringbundleset id="stringbundles">
-    <stringbundle id="stringbundle-global" src="chrome://abpcrawler/locale/global.properties"/>
-  </stringbundleset>
-
   <vbox>
       <label control="backend-url" value="Backend URL:"/>
       <textbox id="backend-url" value="https://www.adblockplus.org"/>
