@@ -1,7 +1,7 @@
 <!ENTITY dialog.title       "Adblock Plus Crawler">
-<!ENTITY accept.label       "Close">
-<!ENTITY accept.accesskey   "l">
 <!ENTITY crawl.label        "Crawl">
 <!ENTITY crawl.accesskey    "c">
+<!ENTITY close.label        "Close">
+<!ENTITY close.accesskey    "l">
 <!ENTITY site.column        "Site">
 <!ENTITY requestUrl.column  "Request URL">
