@@ -20,7 +20,7 @@ function require(module)
 
 let {Crawler} = require("crawler");
 
-function unload()
+function onUnload()
 {
   const fields = ["backend-url", "parallel-tabs"];
   fields.forEach(function(field)
@@ -28,6 +28,11 @@ function unload()
     let control = document.getElementById(field);
     control.setAttribute("value", control.value);
   });
+}
+
+function onClose()
+{
+  return !crawling;
 }
 
 function getBackendUrl()
@@ -42,7 +47,7 @@ function getParallelTabs()
   return parseInt(parallelTabsTextBox.value);
 }
 
-function accept()
+function onAccept()
 {
   let backendUrl = getBackendUrl();
   let parallelTabs = getParallelTabs();
@@ -54,9 +59,4 @@ function accept()
     crawling = acceptButton.disabled = false;
   });
   return false;
-}
-
-function close()
-{
-  return !crawling;
 }
