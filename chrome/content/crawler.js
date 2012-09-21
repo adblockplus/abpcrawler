@@ -18,6 +18,16 @@ function require(module)
 
 let {Crawler} = require("crawler");
 
+function unload()
+{
+  const fields = ["backend-url", "parallel-tabs"];
+  fields.forEach(function(field)
+  {
+    let control = document.getElementById(field);
+    control.setAttribute("value", control.value);
+  });
+}
+
 function getBackendUrl()
 {
   let backendUrlTextBox = document.getElementById("backend-url");
