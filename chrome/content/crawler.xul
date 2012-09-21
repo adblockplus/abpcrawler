@@ -17,15 +17,19 @@
     buttonaccesskeyaccept="&crawl.accesskey;"
     buttonlabelcancel="&close.label;"
     buttonaccesskeycancel="&close.accesskey;"
-    width="600px"
-    height="400px"
-    persist="screenX screenY width height sizemode advancedMode"
+    width="500px"
+    height="200px"
     windowtype="abpcrawler:crawl">
 
   <script type="application/x-javascript;version=1.7" src="crawler.js"/>
 
   <vbox>
       <label control="backend-url" value="Backend URL:"/>
-      <textbox id="backend-url" value="https://www.adblockplus.org"/>
+      <textbox id="backend-url" value="https://www.adblockplus.org" flex="1"/>
+  </vbox>
+
+  <vbox>
+      <label control="parallel-tabs" value="Parallel Tabs:"/>
+      <textbox id="parallel-tabs" type="number" min="1" value="5"/>
   </vbox>
 </dialog>

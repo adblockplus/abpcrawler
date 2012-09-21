@@ -24,9 +24,16 @@ function getBackendUrl()
   return backendUrlTextBox.value;
 }
 
+function getParallelTabs()
+{
+  let parallelTabsTextBox = document.getElementById("parallel-tabs");
+  return parseInt(parallelTabsTextBox.value);
+}
+
 function crawl()
 {
   let backendUrl = getBackendUrl();
-  Crawler.crawl(backendUrl, 5, window.opener);
+  let parallelTabs = getParallelTabs();
+  Crawler.crawl(backendUrl, parallelTabs, window.opener);
   return false;
 }
