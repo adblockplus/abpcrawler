@@ -11,6 +11,7 @@
 <dialog id="abpcrawler-crawler"
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
     title="&dialog.title;"
+    onunload="unload();"
     ondialogaccept="return accept();"
     buttons="accept,cancel"
     buttonlabelaccept="&crawl.label;"
@@ -25,11 +26,13 @@
 
   <vbox>
       <label control="backend-url" value="Backend URL:"/>
-      <textbox id="backend-url" value="https://www.adblockplus.org" flex="1"/>
+      <textbox id="backend-url" value="https://www.adblockplus.org" flex="1"
+               persist="value"/>
   </vbox>
 
   <vbox>
       <label control="parallel-tabs" value="Parallel Tabs:"/>
-      <textbox id="parallel-tabs" type="number" min="1" value="5"/>
+      <textbox id="parallel-tabs" type="number" min="1" value="5"
+               persist="value"/>
   </vbox>
 </dialog>
