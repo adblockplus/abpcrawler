@@ -30,7 +30,7 @@ function getParallelTabs()
   return parseInt(parallelTabsTextBox.value);
 }
 
-function crawl()
+function accept()
 {
   let backendUrl = getBackendUrl();
   let parallelTabs = getParallelTabs();
