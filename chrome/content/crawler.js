@@ -8,6 +8,8 @@ const Cu = Components.utils;
 
 Cu.import("resource://gre/modules/Services.jsm");
 
+let crawling = false;
+
 function require(module)
 {
   let result = {};
@@ -44,6 +46,17 @@ function accept()
 {
   let backendUrl = getBackendUrl();
   let parallelTabs = getParallelTabs();
-  Crawler.crawl(backendUrl, parallelTabs, window.opener);
+  let dialog = document.getElementById("abpcrawler-crawler");
+  let acceptButton = dialog.getButton("accept");
+  crawling = acceptButton.disabled = true;
+  Crawler.crawl(backendUrl, parallelTabs, window.opener, function()
+  {
+    crawling = acceptButton.disabled = false;
+  });
   return false;
+}
+
+function close()
+{
+  return !crawling;
 }

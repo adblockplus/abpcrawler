@@ -12,6 +12,7 @@
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
     title="&dialog.title;"
     onunload="unload();"
+    onclose="return close();"
     ondialogaccept="return accept();"
     buttons="accept,cancel"
     buttonlabelaccept="&crawl.label;"
