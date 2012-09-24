@@ -49,10 +49,19 @@ function onAccept()
   let dialog = document.documentElement;
   let acceptButton = dialog.getButton("accept");
   crawling = acceptButton.disabled = true;
-  Crawler.crawl(backendUrl, parallelTabs, window.opener, function()
+
+  let mainWindow = window.opener;
+  if (!mainWindow || mainWindow.closed)
   {
+    alert( "Unable to find the main window, aborting.");
     crawling = acceptButton.disabled = false;
-  });
+  }
+  else
+    Crawler.crawl(backendUrl, parallelTabs, mainWindow, function()
+    {
+      crawling = acceptButton.disabled = false;
+    });
+
   return false;
 }
 
