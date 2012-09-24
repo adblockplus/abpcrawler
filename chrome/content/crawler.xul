@@ -8,32 +8,35 @@
 
 <!DOCTYPE dialog SYSTEM "chrome://abpcrawler/locale/crawler.dtd">
 
-<dialog id="abpcrawler-crawler"
-    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-    title="&dialog.title;"
-    onunload="onUnload();"
-    ondialogaccept="return onAccept();"
-    ondialogcancel="return onCancel();"
-    buttons="accept,cancel"
-    buttonlabelaccept="&crawl.label;"
-    buttonaccesskeyaccept="&crawl.accesskey;"
-    buttonlabelcancel="&close.label;"
-    buttonaccesskeycancel="&close.accesskey;"
-    width="500px"
-    height="200px"
-    windowtype="abpcrawler:crawl">
+<dialog
+  id="abpcrawler-crawler"
+  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+  title="&dialog.title;"
+  onunload="onUnload();"
+  ondialogaccept="return onAccept();"
+  ondialogcancel="return onCancel();"
+  buttons="accept,cancel"
+  buttonlabelaccept="&crawl.label;"
+  buttonaccesskeyaccept="&crawl.accesskey;"
+  buttonlabelcancel="&close.label;"
+  buttonaccesskeycancel="&close.accesskey;"
+  width="500px"
+  height="200px"
+  windowtype="abpcrawler:crawl">
 
   <script type="application/x-javascript;version=1.7" src="crawler.js"/>
 
   <vbox>
-      <label control="backend-url" value="Backend URL:"/>
-      <textbox id="backend-url" value="https://www.adblockplus.org" flex="1"
-               persist="value"/>
+    <label control="backend-url" value="Backend URL:"/>
+    <textbox
+      id="backend-url" value="https://www.adblockplus.org" flex="1"
+      persist="value"/>
   </vbox>
 
   <vbox>
-      <label control="parallel-tabs" value="Parallel Tabs:"/>
-      <textbox id="parallel-tabs" type="number" min="1" value="5"
-               persist="value"/>
+    <label control="parallel-tabs" value="Parallel Tabs:"/>
+    <textbox
+      id="parallel-tabs" type="number" min="1" value="5"
+      persist="value"/>
   </vbox>
 </dialog>
