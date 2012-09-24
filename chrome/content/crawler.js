@@ -46,7 +46,7 @@ function onAccept()
 {
   let backendUrl = getBackendUrl();
   let parallelTabs = getParallelTabs();
-  let dialog = document.getElementById("abpcrawler-crawler");
+  let dialog = document.documentElement;
   let acceptButton = dialog.getButton("accept");
   crawling = acceptButton.disabled = true;
   Crawler.crawl(backendUrl, parallelTabs, window.opener, function()
