@@ -30,11 +30,6 @@ function onUnload()
   });
 }
 
-function onClose()
-{
-  return !crawling;
-}
-
 function getBackendUrl()
 {
   let backendUrlTextBox = document.getElementById("backend-url");
@@ -59,4 +54,12 @@ function onAccept()
     crawling = acceptButton.disabled = false;
   });
   return false;
+}
+
+function onCancel()
+{
+  let closingPossible = !crawling;
+  if (!closingPossible)
+    alert("Crawling still in progress.");
+  return closingPossible;
 }
