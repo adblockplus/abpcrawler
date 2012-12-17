@@ -1,42 +1,75 @@
 <?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<!DOCTYPE dialog SYSTEM "chrome://abpcrawler/locale/crawler.dtd">
 
 <!-- This Source Code is subject to the terms of the Mozilla Public License
    - version 2.0 (the "License"). You can obtain a copy of the License at
    - http://mozilla.org/MPL/2.0/. -->
 
-<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
-
-<!DOCTYPE dialog SYSTEM "chrome://abpcrawler/locale/crawler.dtd">
-
 <dialog
-  id="abpcrawler-crawler"
-  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-  title="&dialog.title;"
-  onunload="onUnload();"
-  ondialogaccept="return onAccept();"
-  ondialogcancel="return onCancel();"
-  buttons="accept,cancel"
-  buttonlabelaccept="&crawl.label;"
-  buttonaccesskeyaccept="&crawl.accesskey;"
-  buttonlabelcancel="&close.label;"
-  buttonaccesskeycancel="&close.accesskey;"
-  width="500px"
-  height="200px"
-  windowtype="abpcrawler:crawl">
+        id="abpcrawler-crawler"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        title="&dialog.title;"
+        onunload="onUnload();"
+        buttons=","
+        buttonlabelcancel="&close.label;"
+        buttonaccesskeycancel="&close.accesskey;"
+        width="500px"
+        height="200px"
+        windowtype="abpcrawler:crawl">
 
-  <script type="application/x-javascript;version=1.7" src="crawler.js"/>
+    <script type="application/x-javascript;version=1.7" src="crawler_ui.js"/>
+    <script type="application/x-javascript;version=1.7" src="task_test_ui.js"/>
 
-  <vbox>
-    <label control="backend-url" value="Backend URL:"/>
-    <textbox
-      id="backend-url" value="https://www.adblockplus.org" flex="1"
-      persist="value"/>
-  </vbox>
+    <tabbox selectedIndex="2">
+        <tabs>
+            <tab label="Server"/>
+            <tab label="Local"/>
+            <tab label="Task Test"/>
+        </tabs>
+        <tabpanels>
+            <tabpanel>
+                <vbox>
+                    <label control="backend-url" value="Crawl server URL"/>
+                    <textbox
+                            id="backend-url" value="https://www.adblockplus.org" flex="1"
+                            persist="value"/>
+                </vbox>
+                <vbox>
+                    <label control="parallel-tabs" value="Parallel Tabs"/>
+                    <textbox
+                            id="parallel-tabs" type="number" min="1" value="5"
+                            persist="value"/>
+                </vbox>
+                <spacer flex="1"/>
+                <vbox>
+                    <spacer flex="1"/>
+                    <button align="end"
+                            class="dialog"
+                            label="&crawl_start.label;"
+                            accesskey="&crawl_start.accesskey;"/>
+                </vbox>
+            </tabpanel>
+            <tabpanel>
+                <vbox>
+                    <textbox value="Text here."/>
+                </vbox>
+            </tabpanel>
+            <tabpanel>
+                <vbox>
+                    <hbox>
+                        <label>Number of iterations</label>
+                        <textbox flex="0" type="number" value="1000"/>
+                    </hbox>
+                    <spacer flex="1"/>
+                </vbox>
+                <spacer flex="1"/>
+                <vbox>
+                    <spacer flex="1"/>
+                    <button label="Start" onclick="task_test_click();"/>
+                </vbox>
+            </tabpanel>
+        </tabpanels>
+    </tabbox>
 
-  <vbox>
-    <label control="parallel-tabs" value="Parallel Tabs:"/>
-    <textbox
-      id="parallel-tabs" type="number" min="1" value="5"
-      persist="value"/>
-  </vbox>
 </dialog>

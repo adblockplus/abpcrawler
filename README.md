@@ -24,9 +24,9 @@ if it was already installed.
 Usage
 -----
 
-Make sure that Adblock Plus is enabled, then click on the ABP symbol in the extension bar and on _Adblock Plus Crawler_.
-
-Now enter the backend URL and hit _Crawl_.
+Make sure that Adblock Plus is enabled. Click on the ABP symbol in the extension
+bar. In the drop menu, click on the (new) entry _Adblock Plus Crawler_. Now 
+enter the backend URL and hit _Crawl_.
 
 License
 -------
