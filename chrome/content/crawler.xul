@@ -62,11 +62,12 @@
                         <textbox flex="0" type="number" value="1000"/>
                     </hbox>
                     <spacer flex="1"/>
+                    <label id="task_status"/>
                 </vbox>
                 <spacer flex="1"/>
                 <vbox>
                     <spacer flex="1"/>
-                    <button label="Start" onclick="task_test_click();"/>
+                    <button label="Start" onclick="task_start_click();"/>
                 </vbox>
             </tabpanel>
         </tabpanels>

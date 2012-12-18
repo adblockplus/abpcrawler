@@ -29,11 +29,13 @@ let {Crawler} = require( "crawler" );
 function onUnload()
 {
     const fields = ["backend-url", "parallel-tabs"];
-    fields.forEach( function ( field )
-    {
-        let control = document.getElementById( field );
-        control.setAttribute( "value", control.value );
-    } );
+    fields.forEach(
+        function ( field )
+        {
+            let control = document.getElementById( field );
+            control.setAttribute( "value", control.value );
+        }
+    );
 }
 
 function getBackendUrl()
