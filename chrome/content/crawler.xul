@@ -67,7 +67,7 @@
                 <spacer flex="1"/>
                 <vbox>
                     <spacer flex="1"/>
-                    <button label="Start" onclick="task_start_click();"/>
+                    <button id="task_go" label="Start" onclick="task_start_click();"/>
                 </vbox>
             </tabpanel>
         </tabpanels>
