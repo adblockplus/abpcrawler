@@ -22,18 +22,18 @@ function task_finished()
     var status_field = document.getElementById( "task_status" );
     status_field.removeChild( status_field.childNodes[0] );
     status_field.appendChild( document.createTextNode( status ) );
-    Long_Task.log( status );
+    log( status );
 }
 
 function task_start_click()
 {
     if ( !current_task )
     {
-        Long_Task.log( "Clicked start" );
+        log( "Clicked start" );
         current_task = new Long_Task( Long_Task.tg_count( task_finished ) );
         var status_field = document.getElementById( "task_status" );
         status_field.appendChild( document.createTextNode( "Started" ) );
-        Long_Task.log( "Started" );
+        log( "Started" );
         current_task.run();
     }
     else
@@ -41,3 +41,10 @@ function task_start_click()
         // We have a running task, so cancel it.
     }
 }
+
+
+function log( msg )
+{
+    Cu.reportError( "task_ui: " + msg );
+};
+
