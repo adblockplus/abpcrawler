@@ -9,7 +9,7 @@ var {tg_count} = require( "counter_task" );
 
 var current_task = null;
 
-function update_status( s )
+function update_status( s, perform_log )
 {
     var status_field = document.getElementById( "task_status" );
     if ( status_field.childNodes.length > 0 )
@@ -17,7 +17,10 @@ function update_status( s )
         status_field.removeChild( status_field.childNodes[0] );
     }
     status_field.appendChild( document.createTextNode( s ) );
-    log( s );
+    if ( arguments.length >= 2 && perform_log )
+    {
+        log( s );
+    }
 }
 
 function task_finished()
@@ -36,18 +39,20 @@ function task_finished()
 
 function task_count( n )
 {
-    update_status( "Count " + n );
+    update_status( "Count " + n, false );
 }
 
 /*
- * We're overloading the start button also to
+ * We're overloading the start button also to handle cancellation.
  */
 function task_start_click()
 {
     if ( !current_task )
     {
         log( "Clicked start" );
-        current_task = new Long_Task( tg_count( 10, task_count, task_finished ), 15 );
+        let count = document.getElementById( "task_count" ).value;
+        let limit = document.getElementById( "task_limit" ).value;
+        current_task = new Long_Task( tg_count( count, task_count, task_finished ), limit );
         update_status( "Started" );
         current_task.run();
     }

@@ -59,10 +59,17 @@
                 <vbox>
                     <hbox>
                         <label>Number of iterations</label>
-                        <textbox flex="0" type="number" value="1000"/>
+                        <textbox id="task_count" type="number" value="100"/>
+                    </hbox>
+                    <hbox>
+                        <label>Runaway limit</label>
+                        <textbox id="task_limit" type="number" value="15"/>
                     </hbox>
                     <spacer flex="1"/>
-                    <label id="task_status"/>
+                    <hbox>
+                        <label>Status:</label>
+                        <label id="task_status"></label>
+                    </hbox>
                 </vbox>
                 <spacer flex="1"/>
                 <vbox>
