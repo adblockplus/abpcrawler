@@ -63,7 +63,7 @@
                     </hbox>
                     <hbox>
                         <label>Runaway limit</label>
-                        <textbox id="task_limit" type="number" value="15"/>
+                        <textbox id="task_limit" type="number" value="1500"/>
                     </hbox>
                     <spacer flex="1"/>
                     <hbox>
