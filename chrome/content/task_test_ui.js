@@ -5,6 +5,7 @@
  */
 
 var {Long_Task} = require( "task" );
+var {tg_count} = require( "counter_task" );
 
 var current_task = null;
 
@@ -25,12 +26,15 @@ function task_finished()
     log( status );
 }
 
+/*
+ * We're overloading the start button also to
+ */
 function task_start_click()
 {
     if ( !current_task )
     {
         log( "Clicked start" );
-        current_task = new Long_Task( Long_Task.tg_count( task_finished ), 5 );
+        current_task = new Long_Task( tg_count( task_finished ), 5 );
         var status_field = document.getElementById( "task_status" );
         status_field.appendChild( document.createTextNode( "Started" ) );
         log( "Started" );
@@ -46,5 +50,4 @@ function task_start_click()
 function log( msg )
 {
     Cu.reportError( "task_ui: " + msg );
-};
-
+}
