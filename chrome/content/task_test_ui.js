@@ -30,7 +30,7 @@ function task_start_click()
     if ( !current_task )
     {
         log( "Clicked start" );
-        current_task = new Long_Task( Long_Task.tg_count( task_finished ) );
+        current_task = new Long_Task( Long_Task.tg_count( task_finished ), 5 );
         var status_field = document.getElementById( "task_status" );
         status_field.appendChild( document.createTextNode( "Started" ) );
         log( "Started" );
