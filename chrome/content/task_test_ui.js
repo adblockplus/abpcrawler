@@ -4,7 +4,7 @@
  * http://mozilla.org/MPL/2.0/.
  */
 
-var {Task} = require( "task" );
+var {Long_Task} = require( "task" );
 
 var current_task = null;
 
@@ -22,18 +22,18 @@ function task_finished()
     var status_field = document.getElementById( "task_status" );
     status_field.removeChild( status_field.childNodes[0] );
     status_field.appendChild( document.createTextNode( status ) );
-    Task.log( status );
+    Long_Task.log( status );
 }
 
 function task_start_click()
 {
     if ( !current_task )
     {
-        Task.log( "Clicked start" );
-        current_task = new Task( Task.tg_count, task_finished );
+        Long_Task.log( "Clicked start" );
+        current_task = new Long_Task( Long_Task.tg_count, task_finished );
         var status_field = document.getElementById( "task_status" );
         status_field.appendChild( document.createTextNode( "Started" ) );
-        Task.log( "Started" );
+        Long_Task.log( "Started" );
         current_task.run();
     }
     else

@@ -25,7 +25,7 @@
         <tabs>
             <tab label="Server"/>
             <tab label="Local"/>
-            <tab label="Task Test"/>
+            <tab label="Long_Task Test"/>
         </tabs>
         <tabpanels>
             <tabpanel>
