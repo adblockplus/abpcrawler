@@ -9,6 +9,17 @@ var {tg_count} = require( "counter_task" );
 
 var current_task = null;
 
+function update_status( s )
+{
+    var status_field = document.getElementById( "task_status" );
+    if ( status_field.childNodes.length > 0 )
+    {
+        status_field.removeChild( status_field.childNodes[0] );
+    }
+    status_field.appendChild( document.createTextNode( s ) );
+    log( s );
+}
+
 function task_finished()
 {
     if ( current_task.cancelled )
@@ -19,11 +30,13 @@ function task_finished()
     {
         status = "Finished";
     }
+    update_status( status );
+    current_task = null;
+}
 
-    var status_field = document.getElementById( "task_status" );
-    status_field.removeChild( status_field.childNodes[0] );
-    status_field.appendChild( document.createTextNode( status ) );
-    log( status );
+function task_count( n )
+{
+    update_status( "Count " + n );
 }
 
 /*
@@ -34,10 +47,8 @@ function task_start_click()
     if ( !current_task )
     {
         log( "Clicked start" );
-        current_task = new Long_Task( tg_count( task_finished ), 5 );
-        var status_field = document.getElementById( "task_status" );
-        status_field.appendChild( document.createTextNode( "Started" ) );
-        log( "Started" );
+        current_task = new Long_Task( tg_count( 10, task_count, task_finished ), 15 );
+        update_status( "Started" );
         current_task.run();
     }
     else
