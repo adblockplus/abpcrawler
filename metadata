@@ -1,9 +1,8 @@
 [general]
 id=abpcrawler@adblockplus.org
 basename=abpcrawler
-branchname=ABP_CRAWLER
 version=0.1
 author=Felix H. Dahlke
 
 [compat]
-firefox=13.0/18.0a1
+firefox=13.0/20.0a1
