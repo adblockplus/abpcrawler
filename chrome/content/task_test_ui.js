@@ -23,6 +23,17 @@ function update_status( s, perform_log )
     }
 }
 
+function update_button( b )
+{
+    var button = document.getElementById( "task_go" );
+    if ( b ) {
+        button.label = "Cancel"
+    } else {
+        button.label = "Start"
+    }
+
+}
+
 function task_finished()
 {
     if ( current_task.cancelled )
@@ -34,6 +45,7 @@ function task_finished()
         status = "Finished";
     }
     update_status( status );
+    update_button( false );
     current_task = null;
 }
 
@@ -54,10 +66,13 @@ function task_start_click()
         let limit = document.getElementById( "task_limit" ).value;
         current_task = new Long_Task( tg_count( count, task_count, task_finished ), limit );
         update_status( "Started" );
+        update_button( true );
         current_task.run();
     }
     else
     {
+        current_task.cancel();
+        update_button( false );
         // We have a running task, so cancel it.
     }
 }
