@@ -1,7 +1,6 @@
 [general]
 id=abpcrawler@adblockplus.org
 basename=abpcrawler
-branchname=ABP_CRAWLER
 version=0.1
 author=Felix H. Dahlke
 
