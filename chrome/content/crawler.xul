@@ -6,10 +6,12 @@
    - version 2.0 (the "License"). You can obtain a copy of the License at
    - http://mozilla.org/MPL/2.0/. -->
 
+<!-- onload="load();" -->
 <dialog
         id="abpcrawler-crawler"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         title="&dialog.title;"
+        onload="loader();"
         onunload="onUnload();"
         buttons=","
         buttonlabelcancel="&close.label;"
@@ -21,10 +23,10 @@
     <script type="application/x-javascript;version=1.7" src="crawler_ui.js"/>
     <script type="application/x-javascript;version=1.7" src="task_test_ui.js"/>
 
-    <tabbox selectedIndex="2">
+    <tabbox selectedIndex="1">
         <tabs>
-            <tab label="Server"/>
-            <tab label="Local"/>
+            <tab label="Legacy"/>
+            <tab label="New Dialog"/>
             <tab label="Long_Task Test"/>
         </tabs>
         <tabpanels>
@@ -52,7 +54,62 @@
             </tabpanel>
             <tabpanel>
                 <vbox>
-                    <textbox value="Text here."/>
+                    <groupbox>
+                        <caption label="Instructions"/>
+                        <tabbox id="instructions_tabbox" selectedIndex="2">
+                            <tabs>
+                                <tab label="Server"/>
+                                <tab label="Local"/>
+                                <tab label="Fixed"/>
+                            </tabs>
+                            <tabpanels>
+                                <tabpanel>
+                                    <label>Retrieve from Server</label>
+                                </tabpanel>
+                                <tabpanel>
+                                    <label>Use Local File</label>
+                                </tabpanel>
+                                <tabpanel>
+                                    <label>Use Fixed List</label>
+                                </tabpanel>
+                            </tabpanels>
+                        </tabbox>
+                    </groupbox>
+                    <groupbox>
+                        <caption label="Storage"/>
+                        <tabbox id="storage_tabbox" selectedIndex="2">
+                            <tabs>
+                                <tab label="Server"/>
+                                <tab label="Local"/>
+                                <tab label="None"/>
+                            </tabs>
+                            <tabpanels>
+                                <tabpanel>
+                                    <label>Server</label>
+                                </tabpanel>
+                                <tabpanel>
+                                    <label>Local</label>
+                                </tabpanel>
+                                <tabpanel>
+                                    <label>No Reporting.</label>
+                                </tabpanel>
+                            </tabpanels>
+                        </tabbox>
+                    </groupbox>
+                    <button id="crawl_go"
+                            oncommand="start_crawl();"
+                            align="end" class="dialog"
+                            label="&crawl_start.label;"/>
+                </vbox>
+                <vbox>
+                    <checkbox id="display_log"
+                              label="Display log"
+                              disabled="true"
+                              checked="true"/>
+                    <textbox id="log_box"
+                             multiline="true" cols="132" rows="40"
+                             readonly="true"
+                             placeholder="Activity Log"/>
                 </vbox>
             </tabpanel>
             <tabpanel>
@@ -74,7 +131,7 @@
                 <spacer flex="1"/>
                 <vbox>
                     <spacer flex="1"/>
-                    <button id="task_go" label="Start" onclick="task_start_click();"/>
+                    <button id="task_go" label="Start" oncommand="task_start_click();"/>
                 </vbox>
             </tabpanel>
         </tabpanels>
