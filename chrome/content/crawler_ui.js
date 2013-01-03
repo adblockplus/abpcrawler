@@ -5,9 +5,10 @@
  */
 
 /*
- * crawler_dialog.js
- *
- * These functions implement the user interface behaviors of the top-level control dialog.
+ * crawler_ui.js
+ */
+/**
+ * @fileOverview These functions implement the user interface behaviors of the top-level control dialog.
  */
 
 const Cu = Components.utils;
@@ -21,16 +22,22 @@ function require( module )
     let result = {};
     result.wrappedJSObject = result;
     Services.obs.notifyObservers( result, "abpcrawler-require", module );
+    if ( !("exports" in result) )
+    {
+        Cu.reportError( "crawler_ui require: 'exports' missing from module \"" + module + "\"" );
+    }
     return result.exports;
 }
-
 let {Crawler} = require( "crawler" );
+let {Instruction} = require( "instruction" );
+let {Logger} = require( "logger" );
+
 
 function onUnload()
 {
     const fields = ["backend-url", "parallel-tabs"];
     fields.forEach(
-        function ( field )
+        function( field )
         {
             let control = document.getElementById( field );
             control.setAttribute( "value", control.value );
@@ -65,7 +72,7 @@ function onAccept()
         crawling = acceptButton.disabled = false;
     }
     else
-        Crawler.crawl( backendUrl, parallelTabs, mainWindow, function ()
+        Crawler.crawl_legacy( backendUrl, parallelTabs, mainWindow, function()
         {
             crawling = acceptButton.disabled = false;
         } );
@@ -80,3 +87,67 @@ function onCancel()
         alert( "Crawling still in progress." );
     return closingPossible;
 }
+
+//-------------------------------------------------------
+// New code
+//-------------------------------------------------------
+
+var current_crawler = null;
+var current_crawl = null;
+var go_button;
+
+function loader()
+{
+    var log = crawler_ui_log;
+    go_button = document.getElementById( "crawl_go" );
+}
+
+function start_crawl()
+{
+    var log = crawler_ui_log;
+    log( "Start" );
+
+    // Only permissible list is the fixed one.
+    var si = document.getElementById( "instructions_tabbox" ).getAttribute( "selectedIndex" );
+    if ( si != 2 )
+    {
+        return false;
+    }
+    var browse_list = ["yahoo.com", "ksl.com"];
+
+    // Only permissible list is the null one.
+    si = document.getElementById( "storage_tabbox" ).getAttribute( "selectedIndex" );
+    if ( si != 2 )
+    {
+        return false;
+    }
+    var storage = null;
+
+    current_crawler = new Crawler( Instruction.basic( browse_list, storage ), new Crawl_Display() );
+    current_crawl = new Long_Task( current_crawler.task() );
+    current_crawl.run();
+}
+
+/**
+ * Constructor for a display object for the crawler.
+ */
+function Crawl_Display()
+{
+    this.log_box = document.getElementById( "log_box" );
+}
+
+Crawl_Display.prototype.log = function( message )
+{
+    this.log_box.value += message + "\n"
+    crawler_ui_log( message + "\nstack: " + Components.stack.toString() );
+};
+
+crawler_ui_log = (new Logger( "crawler_ui" )).make_log();
+
+/*
+ function crawler_ui_log( message )
+ {
+ //Cu.reportError( "crawler_ui: " + message );
+ var log = (new Logger("crawler_ui").make_log());
+ log( message );
+ }*/

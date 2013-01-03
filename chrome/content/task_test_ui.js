@@ -26,9 +26,11 @@ function update_status( s, perform_log )
 function update_button( b )
 {
     var button = document.getElementById( "task_go" );
-    if ( b ) {
+    if ( b )
+    {
         button.label = "Cancel"
-    } else {
+    } else
+    {
         button.label = "Start"
     }
 
@@ -62,6 +64,16 @@ function task_start_click()
     if ( !current_task )
     {
         log( "Clicked start" );
+        if ( !tg_count )
+        {
+            log( "No tg_count" );
+        }
+        if ( !Long_Task )
+        {
+            log( "No Long_Task" );
+        }
+        log( "require counter_task: " + require( "counter_task" ).toString() );
+
         let count = document.getElementById( "task_count" ).value;
         let limit = document.getElementById( "task_limit" ).value;
         current_task = new Long_Task( tg_count( count, task_count, task_finished ), limit );
