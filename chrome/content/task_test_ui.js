@@ -76,7 +76,7 @@ function task_start_click()
 
         let count = document.getElementById( "task_count" ).value;
         let limit = document.getElementById( "task_limit" ).value;
-        current_task = new Long_Task( tg_count( count, task_count, task_finished ), limit );
+        current_task = new Long_Task( tg_count( count, task_count, task_finished ), false, limit );
         update_status( "Started" );
         update_button( true );
         current_task.run();
