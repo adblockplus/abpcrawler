@@ -138,8 +138,7 @@ function Crawl_Display()
 
 Crawl_Display.prototype.log = function( message )
 {
-    this.log_box.value += message + "\n"
-    crawler_ui_log( message + "\nstack: " + Components.stack.toString() );
+    this.log_box.value += message + "\n";
 };
 
 crawler_ui_log = (new Logger( "crawler_ui" )).make_log();
