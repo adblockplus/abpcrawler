@@ -5,7 +5,7 @@
  */
 
 var {Long_Task} = require( "task" );
-var {tg_count} = require( "counter_task" );
+var {Counting_Task} = require( "counter_task" );
 
 var current_task = null;
 
@@ -64,9 +64,9 @@ function task_start_click()
     if ( !current_task )
     {
         log( "Clicked start" );
-        if ( !tg_count )
+        if ( !Counting_Task )
         {
-            log( "No tg_count" );
+            log( "No Counting_Task" );
         }
         if ( !Long_Task )
         {
@@ -76,7 +76,7 @@ function task_start_click()
 
         let count = document.getElementById( "task_count" ).value;
         let limit = document.getElementById( "task_limit" ).value;
-        current_task = new Long_Task( tg_count( count, task_count, task_finished ), false, limit );
+        current_task = new Long_Task( new Counting_Task( count, task_count, task_finished ), false, limit );
         update_status( "Started" );
         update_button( true );
         current_task.run();
