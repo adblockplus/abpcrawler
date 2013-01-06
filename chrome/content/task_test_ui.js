@@ -77,7 +77,23 @@ function task_start_click()
 
         let count = document.getElementById( "task_count" ).value;
         let limit = document.getElementById( "task_limit" ).value;
-        current_task = new Long_Task( new Counting_Task( count, task_count, task_finished ), false, limit );
+        var variant;
+        switch ( document.getElementById( "counting_variant" ).selectedIndex )
+        {
+            case 0:
+                variant = { type: "continuous" };
+                break;
+            case 1:
+                variant = { type: "segmented fast" };
+                break;
+            case 2:
+                variant = { type: "segmented slow", interval: document.getElementById( "slow_interval" ).value};
+                break;
+            default:
+                log( "Unknown variant. This is an implementation defect." );
+                throw "bad variant";
+        }
+        current_task = new Long_Task( new Counting_Task( count, task_count, task_finished, variant ), false, limit );
         update_status( "Started" );
         update_button( true );
         current_task.run();
