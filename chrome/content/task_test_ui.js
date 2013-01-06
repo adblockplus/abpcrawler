@@ -6,6 +6,7 @@
 
 var {Long_Task} = require( "task" );
 var {Counting_Task} = require( "counter_task" );
+let {Logger} = require( "logger" );
 
 var current_task = null;
 
@@ -89,8 +90,4 @@ function task_start_click()
     }
 }
 
-
-function log( msg )
-{
-    Cu.reportError( "task_ui: " + msg );
-}
+var log = (new Logger( "task_ui" )).make_log();
