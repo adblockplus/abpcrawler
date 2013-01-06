@@ -114,6 +114,14 @@
             </tabpanel>
             <tabpanel>
                 <vbox>
+                    <radiogroup id="counting_variant">
+                        <radio id="continuous" label="Continuous"/>
+                        <radio id="segmented_fast" label="Segmented Fast"/>
+                        <hbox>
+                            <radio id="segmented_slow" label="Segmented Slow" selected="true"/>
+                            <textbox id="slow_interval" type="number" value="100"/>
+                        </hbox>
+                    </radiogroup>
                     <hbox>
                         <label>Number of iterations</label>
                         <textbox id="task_count" type="number" value="100000"/>
