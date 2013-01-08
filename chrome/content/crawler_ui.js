@@ -28,10 +28,10 @@ function require( module )
     }
     return result.exports;
 }
-let {Crawler} = require( "crawler" );
 let {Instruction} = require( "instruction" );
+let {Long_Task} = require( "task" );
+let {Crawler} = require( "crawler" );
 let {Logger} = require( "logger" );
-
 
 function onUnload()
 {
@@ -107,10 +107,13 @@ function start_crawl()
     var log = crawler_ui_log;
     log( "Start" );
 
+    var log_window = new Crawl_Display();
+
     // Only permissible list is the fixed one.
     var si = document.getElementById( "instructions_tabbox" ).getAttribute( "selectedIndex" );
     if ( si != 2 )
     {
+        log_window.log( "Temporary: May only use fixed list. Aborted." );
         return false;
     }
     var browse_list = ["yahoo.com", "ksl.com"];
@@ -119,12 +122,20 @@ function start_crawl()
     si = document.getElementById( "storage_tabbox" ).getAttribute( "selectedIndex" );
     if ( si != 2 )
     {
+        log_window.log( "Temporary: May only use null. Aborted." );
         return false;
     }
     var storage = null;
 
-    current_crawler = new Crawler( Instruction.basic( browse_list, storage ), new Crawl_Display() );
-    current_crawl = new Long_Task( current_crawler.task() );
+    let mainWindow = window.opener;
+    if ( !mainWindow || mainWindow.closed )
+    {
+        Cu.reportError( "Unable to find the main window, aborting." );
+        log_window.log( "Unable to find the main window, aborting." );
+        return false;
+    }
+    current_crawler = new Crawler( Instruction.basic( browse_list, storage ), log_window, mainWindow );
+    current_crawl = new Long_Task( current_crawler );
     current_crawl.run();
 }
 
@@ -142,11 +153,3 @@ Crawl_Display.prototype.log = function( message )
 };
 
 crawler_ui_log = (new Logger( "crawler_ui" )).make_log();
-
-/*
- function crawler_ui_log( message )
- {
- //Cu.reportError( "crawler_ui: " + message );
- var log = (new Logger("crawler_ui").make_log());
- log( message );
- }*/
