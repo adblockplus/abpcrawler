@@ -117,6 +117,7 @@ function start_crawl()
         return false;
     }
     var browse_list = ["yahoo.com", "ksl.com"];
+    var instructions = Instruction.basic( browse_list, storage );
 
     // Only permissible list is the null one.
     si = document.getElementById( "storage_tabbox" ).getAttribute( "selectedIndex" );
@@ -134,7 +135,7 @@ function start_crawl()
         log_window.log( "Unable to find the main window, aborting." );
         return false;
     }
-    current_crawler = new Crawler( Instruction.basic( browse_list, storage ), log_window, mainWindow );
+    current_crawler = new Crawler( instructions, log_window, mainWindow );
     current_crawl = new Long_Task( current_crawler );
     current_crawl.run();
 }
