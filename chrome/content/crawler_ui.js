@@ -33,7 +33,7 @@ let {Long_Task} = require( "task" );
 let {Crawler} = require( "crawler" );
 let {Logger} = require( "logger" );
 
-function onUnload()
+function onUnload_legacy()
 {
     const fields = ["backend-url", "parallel-tabs"];
     fields.forEach(
@@ -98,8 +98,26 @@ var go_button;
 
 function loader()
 {
-    var log = crawler_ui_log;
     go_button = document.getElementById( "crawl_go" );
+}
+
+function onShutdown()
+{
+    unloader();
+}
+
+function unloader()
+{
+    if ( current_crawler )
+    {
+        current_crawler.close();
+        current_crawler = null;
+    }
+    if ( current_crawl )
+    {
+        current_crawl.close();
+        current_crawl = null;
+    }
 }
 
 function start_crawl()
@@ -138,6 +156,7 @@ function start_crawl()
     current_crawler = new Crawler( instructions, log_window, mainWindow );
     current_crawl = new Long_Task( current_crawler );
     current_crawl.run();
+    return true;
 }
 
 /**
@@ -154,3 +173,4 @@ Crawl_Display.prototype.log = function( message )
 };
 
 crawler_ui_log = (new Logger( "crawler_ui" )).make_log();
+

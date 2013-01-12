@@ -12,7 +12,7 @@
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         title="&dialog.title;"
         onload="loader();"
-        onunload="onUnload();"
+        onunload="unloader();"
         buttons=","
         buttonlabelcancel="&close.label;"
         buttonaccesskeycancel="&close.accesskey;"
