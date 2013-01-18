@@ -126,6 +126,7 @@ function start_crawl()
     log( "Start crawl", false );
 
     var log_window = new Crawl_Display();
+    Instruction.configure_log( log_window );
 
     // Only permissible list is the fixed one.
     var si = document.getElementById( "instructions_tabbox" ).getAttribute( "selectedIndex" );
