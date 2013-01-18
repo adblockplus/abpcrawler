@@ -107,7 +107,7 @@
                               disabled="true"
                               checked="true"/>
                     <textbox id="log_box"
-                             multiline="true" cols="132" rows="40"
+                             multiline="true" cols="132" rows="40" wrap="off"
                              readonly="true"
                              placeholder="Activity Log"/>
                 </vbox>

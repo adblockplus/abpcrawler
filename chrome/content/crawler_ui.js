@@ -123,7 +123,7 @@ function unloader()
 function start_crawl()
 {
     var log = crawler_ui_log;
-    log( "Start" );
+    log( "Start crawl", false );
 
     var log_window = new Crawl_Display();
 
