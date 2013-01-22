@@ -128,7 +128,7 @@ function start_crawl()
     var log_window = new Crawl_Display();
     Instruction.configure_log( log_window );
 
-    // Only permissible list is the fixed one.
+    // Only permissible input is the fixed one.
     var si = document.getElementById( "instructions_tabbox" ).getAttribute( "selectedIndex" );
     if ( si != 2 )
     {
@@ -136,9 +136,23 @@ function start_crawl()
         return false;
     }
     var browse_list = ["yahoo.com", "ksl.com"];
-    var instructions = Instruction.basic( browse_list, storage );
 
-    // Only permissible list is the null one.
+    var format = null;
+    switch ( document.getElementById( "format" ).selectedIndex )
+    {
+        case 0:
+            format = "JSON";
+            break;
+        case 1:
+            format = "YAML";
+            break;
+        default:
+            log_window.log( "Unknown output format. Aborted." );
+            return false;
+    }
+    var instructions = Instruction.basic( browse_list, storage, format );
+
+    // Only permissible storage is the null one.
     si = document.getElementById( "storage_tabbox" ).getAttribute( "selectedIndex" );
     if ( si != 2 )
     {
