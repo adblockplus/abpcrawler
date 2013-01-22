@@ -76,6 +76,13 @@
                         </tabbox>
                     </groupbox>
                     <groupbox>
+                        <caption label="Output Format"/>
+                        <radiogroup id="format">
+                            <radio id="json" label="JSON"/>
+                            <radio id="yaml" label="YAML" selected="true"/>
+                        </radiogroup>
+                    </groupbox>
+                    <groupbox>
                         <caption label="Storage"/>
                         <tabbox id="storage_tabbox" selectedIndex="2">
                             <tabs>
