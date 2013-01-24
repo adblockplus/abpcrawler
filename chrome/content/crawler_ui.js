@@ -151,7 +151,6 @@ function start_crawl()
             log_window.log( "Unknown output encoding. Aborted." );
             return false;
     }
-    var instructions = Instruction.basic( browse_list, log_to_textbox /* no storage at present */ );
 
     // Only permissible storage is the null one.
     si = document.getElementById( "storage_tabbox" ).getAttribute( "selectedIndex" );
@@ -160,7 +159,8 @@ function start_crawl()
         log_window.log( "Temporary: May only use null. Aborted." );
         return false;
     }
-    var storage = null;
+    var storage = new Storage.Multiple( [ log_to_textbox, new Storage.Bit_Bucket()], true );
+    var instructions = Instruction.basic( browse_list, storage /* no other storage at present */ );
 
     let mainWindow = window.opener;
     if ( !mainWindow || mainWindow.closed )
