@@ -28,6 +28,7 @@ function require( module )
     }
     return result.exports;
 }
+let {Storage} = require( "storage" );
 let {Instruction} = require( "instruction" );
 let {Long_Task} = require( "task" );
 let {Crawler} = require( "crawler" );
@@ -128,6 +129,8 @@ function start_crawl()
     var log_window = new Crawl_Display();
     Instruction.configure_log( log_window );
 
+    Storage.Display_Log.init( log_window );
+
     // Only permissible input is the fixed one.
     var si = document.getElementById( "instructions_tabbox" ).getAttribute( "selectedIndex" );
     if ( si != 2 )
@@ -137,20 +140,20 @@ function start_crawl()
     }
     var browse_list = ["yahoo.com", "ksl.com"];
 
-    var format = null;
+    var encoding = null;
     switch ( document.getElementById( "format" ).selectedIndex )
     {
         case 0:
-            format = "JSON";
+            encoding = "JSON";
             break;
         case 1:
-            format = "YAML";
+            encoding = "YAML";
             break;
         default:
-            log_window.log( "Unknown output format. Aborted." );
+            log_window.log( "Unknown output encoding. Aborted." );
             return false;
     }
-    var instructions = Instruction.basic( browse_list, storage, format );
+    var instructions = Instruction.basic( browse_list, null /* no storage at present */ );
 
     // Only permissible storage is the null one.
     si = document.getElementById( "storage_tabbox" ).getAttribute( "selectedIndex" );
