@@ -127,9 +127,7 @@ function start_crawl()
     log( "Start crawl", false );
 
     var log_window = new Crawl_Display();
-    Instruction.configure_log( log_window );
-
-    Storage.Display_Log.init( log_window );
+    var log_to_textbox = new Storage.Display_Log( log_window );
 
     // Only permissible input is the fixed one.
     var si = document.getElementById( "instructions_tabbox" ).getAttribute( "selectedIndex" );
@@ -153,7 +151,7 @@ function start_crawl()
             log_window.log( "Unknown output encoding. Aborted." );
             return false;
     }
-    var instructions = Instruction.basic( browse_list, null /* no storage at present */ );
+    var instructions = Instruction.basic( browse_list, log_to_textbox /* no storage at present */ );
 
     // Only permissible storage is the null one.
     si = document.getElementById( "storage_tabbox" ).getAttribute( "selectedIndex" );
