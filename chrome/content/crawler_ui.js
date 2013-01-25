@@ -188,5 +188,10 @@ Crawl_Display.prototype.log = function( message )
     this.log_box.value += message + "\n";
 };
 
+Crawl_Display.prototype.write = function( message )
+{
+    this.log_box.value += message;
+};
+
 crawler_ui_log = (new Logger( "crawler_ui" )).make_log();
 
