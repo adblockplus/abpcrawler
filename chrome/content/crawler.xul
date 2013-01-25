@@ -76,6 +76,22 @@
                         </tabbox>
                     </groupbox>
                     <groupbox>
+                        <caption label="Tabs"/>
+                        <vbox>
+                            <hbox>
+                                <label>Simultaneous Loads</label>
+                                <textbox
+                                        id="number_of_tabs" type="number" min="1" value="5"
+                                        width="32"
+                                        persist="value"/>
+                            </hbox>
+                            <checkbox id="leave_open"
+                                      label="Leave tabs open"
+                                      checked="false"
+                                      persist="checked"/>
+                        </vbox>
+                    </groupbox>
+                    <groupbox>
                         <caption label="Output Format"/>
                         <radiogroup id="format">
                             <radio id="json" label="JSON"/>
