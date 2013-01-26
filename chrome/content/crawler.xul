@@ -22,12 +22,14 @@
 
     <script type="application/x-javascript;version=1.7" src="crawler_ui.js"/>
     <script type="application/x-javascript;version=1.7" src="task_test_ui.js"/>
+    <script type="application/x-javascript;version=1.7" src="sandbox_ui.js"/>
 
-    <tabbox selectedIndex="1">
+    <tabbox selectedIndex="3">
         <tabs>
             <tab label="Legacy"/>
             <tab label="New Dialog"/>
             <tab label="Long_Task Test"/>
+            <tab label="Sandbox"/>
         </tabs>
         <tabpanels>
             <tabpanel>
@@ -164,6 +166,19 @@
                     <spacer flex="1"/>
                     <button id="task_go" label="Start" oncommand="task_start_click();"/>
                 </vbox>
+            </tabpanel>
+            <tabpanel>
+                <button id="sandbox_go"
+                        label="Go"
+                        maxwidth="100" maxheight="24"
+                        flex="0"
+                        oncommand="sandbox_start();"/>
+                <vbox flex="1">
+                    <textbox id="sandbox_output"
+                             multiline="true" wrap="off"
+                             rows="40"/>
+                </vbox>
+
             </tabpanel>
         </tabpanels>
     </tabbox>
