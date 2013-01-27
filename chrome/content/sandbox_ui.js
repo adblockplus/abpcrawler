@@ -71,6 +71,7 @@ function sandbox_start()
     {
         log( "3. error: deferred array spec returned null generator" );
     }
+    y.sequence_start();
     for ( let i = 0 ; i < test_array.length ; ++i )
     {
         try
@@ -96,8 +97,10 @@ function sandbox_start()
     };
 
     g = y.write( [], Encoding.array( false, Encoding.array( false ) ) );
+    y.sequence_start();
     for ( let i = 0 ; i < 3 ; ++i )
     {
+        y.sequence_start();
         for ( let j = 0 ; j <= i ; ++j )
         {
             let s = "item " + ( i + 1 ) + "." + j;
