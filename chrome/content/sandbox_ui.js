@@ -51,12 +51,16 @@ function sandbox_start()
     //-----------------------------------------------------------------------------------------
     write( "---\n" );
     write( "# 2\n" );
-    Cu.reportError( "2." );
-    var test_array = ["item 1", "item 2", "item 3"];
-    g = y.write( test_array, Encoding.array() );
-    if ( g )
+    try
     {
-        log( "2. error: immediate array spec returned non-null generator" );
+        Cu.reportError( "2." );
+        var test_array = ["item 1", "item 2", "item 3"];
+        y.write( test_array, Encoding.array() );
+    }
+    catch ( e )
+    {
+        Cu.reportError( "error in 2: " + e.toString() + "\n" + e.stack );
+        throw e;
     }
 
     //-----------------------------------------------------------------------------------------
