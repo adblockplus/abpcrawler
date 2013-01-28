@@ -4,3 +4,4 @@ syntax: glob
 *.zip
 *.pyc
 *.sh
+lib/storage@98.js
