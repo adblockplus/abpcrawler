@@ -72,7 +72,7 @@ function sandbox_start()
         /*
          * An array of deferred arrays.
          */
-        y.write( [], Encoding.array_stream() );
+        y.write( [ "3" ], Encoding.array_stream() );
         y.sequence_start();
         for ( let i = 0 ; i < test_array.length ; ++i )
         {
@@ -104,7 +104,7 @@ function sandbox_start()
 
     };
 
-    g = y.write( [], Encoding.array_stream( Encoding.array_stream() ) );
+    g = y.write( [ "4" ], Encoding.array_stream( Encoding.array_stream() ) );
     y.sequence_start();
     for ( let i = 0 ; i < 3 ; ++i )
     {
