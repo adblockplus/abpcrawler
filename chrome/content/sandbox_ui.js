@@ -53,7 +53,7 @@ function sandbox_start()
     write( "# 2\n" );
     Cu.reportError( "2." );
     var test_array = ["item 1", "item 2", "item 3"];
-    g = y.write( test_array, Encoding.array( true ) );
+    g = y.write( test_array, Encoding.array() );
     if ( g )
     {
         log( "2. error: immediate array spec returned non-null generator" );
@@ -66,17 +66,13 @@ function sandbox_start()
     /*
      * An array of deferred arrays.
      */
-    g = y.write( [], Encoding.array( false ) );
-    if ( !g )
-    {
-        log( "3. error: deferred array spec returned null generator" );
-    }
+    y.write( [], Encoding.array() );
     y.sequence_start();
     for ( let i = 0 ; i < test_array.length ; ++i )
     {
         try
         {
-            g.send( test_array[i] );
+            y.sequence_send( test_array[i] );
         }
         catch ( e )
         {
@@ -107,7 +103,7 @@ function sandbox_start()
             log( "4. " + s );
             try
             {
-                g.send( s );
+                y.sequence_send( s );
             }
             catch ( e )
             {
