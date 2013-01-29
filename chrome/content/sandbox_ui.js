@@ -106,10 +106,11 @@ function sandbox_start()
 
     g = y.write( [ "4" ], Encoding.array_stream( Encoding.array_stream() ) );
     y.sequence_start();
-    for ( let i = 0 ; i < 3 ; ++i )
+    for ( let i = 0 ; i < 5 ; ++i )
     {
         y.sequence_start();
-        for ( let j = 0 ; j <= i ; ++j )
+        let n = [3, 1, 0, 2, 4][ i ];
+        for ( let j = 0 ; j <= n ; ++j )
         {
             let s = "item " + ( i + 1 ) + "." + j;
             log( "4. " + s );
