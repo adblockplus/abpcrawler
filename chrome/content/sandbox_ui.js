@@ -54,7 +54,7 @@ function sandbox_start()
     try
     {
         Cu.reportError( "2." );
-        var test_array = ["item 1", "item 2", "item 3"];
+        var test_array = ["item 1", "item 2", ["item 3.1", "item 3.2"], "item 4"];
         y.write( test_array, Encoding.array() );
     }
     catch ( e )
