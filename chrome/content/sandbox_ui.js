@@ -90,7 +90,7 @@ function sandbox_start()
     {
         y.sequence_start();
         let n = [1, 0, 2][ i ];
-        for ( let j = 0 ; j <= n ; ++j )
+        for ( let j = 0 ; j < n ; ++j )
         {
             let s = "item " + ( i + 1 ) + "." + j;
             //log( "4. " + s );
