@@ -14,23 +14,6 @@ function sandbox_start()
         output_box.value += s;
     };
 
-    var test_instance = {
-        time_start: Logger.timestamp(),
-        instruction: { this: "this", that: "that", the_other_thing: null },
-        observation: []
-    };
-    var test_encoding = {
-        __encode_as__: Encoding.as_object( [
-            // prelude
-            Encoding.immediate_fields( ["time_start", "instruction"] ),
-            // observation
-            Encoding.field( "observation", Encoding.array( false ) ),
-            //Encoding.array_deferred( "observation" ),
-            // postlude
-            Encoding.immediate_fields( ["time_finish", "termination"] )
-        ] )
-    };
-
     var y = new Encoding.YAML_stream( write );
 
     //-----------------------------------------------------------------------------------------
@@ -99,17 +82,13 @@ function sandbox_start()
     write( "---\n" );
     write( "# 4\n" );
     Cu.reportError( "4." );
-    var test4_view = {
-        __view__: Encoding.array( false )
 
-    };
-
-    g = y.write( [ "4" ], Encoding.array_stream( Encoding.array_stream() ) );
+    y.write( [ "4" ], Encoding.array_stream( Encoding.array_stream() ) );
     y.sequence_start();
-    for ( let i = 0 ; i < 5 ; ++i )
+    for ( let i = 0 ; i < 3 ; ++i )
     {
         y.sequence_start();
-        let n = [3, 1, 0, 2, 4][ i ];
+        let n = [1, 0, 2][ i ];
         for ( let j = 0 ; j <= n ; ++j )
         {
             let s = "item " + ( i + 1 ) + "." + j;
@@ -128,5 +107,44 @@ function sandbox_start()
         y.sequence_stop();
     }
     y.sequence_stop();
-}
 
+    //-----------------------------------------------------------------------------------------
+    write( "---\n" );
+    write( "# 5\n" );
+    Cu.reportError( "5." );
+
+    var object_5 = {
+        time_start: "now",
+        instruction: {
+            "this": "this",
+            that: "that",
+            the_other_thing: null
+        }
+    };
+    var object_5_encoding = Encoding.as_object( [
+        // prelude
+        Encoding.immediate_fields( ["time_start", "instruction"] ),
+        // observation
+        Encoding.field( "observation", Encoding.array_stream() ),
+        // postlude
+        Encoding.immediate_fields( ["time_finish", "termination"] )
+    ] );
+
+    y.write( object_5, object_5_encoding );
+    y.sequence_start();
+    for ( let i = 0 ; i < 3 ; ++i )
+    {
+    }
+    object_5.time_finish = "later";
+    object_5.termination = "success";
+    y.sequence_stop();
+
+    //-----------------------------------------------------------------------------------------
+    write( "---\n" );
+    if ( !y.may_write() )
+    {
+        var failure_message = "FAILURE: object streamer ended in an incomplete state.";
+        write( failure_message );
+        Cu.reportError( failure_message );
+    }
+}
