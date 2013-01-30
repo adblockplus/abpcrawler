@@ -15,6 +15,7 @@ function sandbox_start()
     };
 
     var y = new Encoding.YAML_stream( write );
+    y.logger.suppress( true );
 
     //-----------------------------------------------------------------------------------------
     write( "---\n" );
@@ -92,7 +93,7 @@ function sandbox_start()
         for ( let j = 0 ; j <= n ; ++j )
         {
             let s = "item " + ( i + 1 ) + "." + j;
-            log( "4. " + s );
+            //log( "4. " + s );
             try
             {
                 y.sequence_send( s );
