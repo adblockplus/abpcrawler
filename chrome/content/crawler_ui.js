@@ -119,7 +119,7 @@ function start_crawl()
         log_window.log( "Unable to find the main window, aborting." );
         return false;
     }
-    current_crawler = new Crawler( instructions, storage, log_window, mainWindow, leave_open() );
+    current_crawler = new Crawler( instructions, storage, log_window, mainWindow, leave_open(), encoding );
     current_crawl = new Long_Task( current_crawler );
     current_crawl.run();
     return true;
