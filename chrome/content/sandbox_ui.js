@@ -135,6 +135,7 @@ function sandbox_start()
     y.sequence_start();
     for ( let i = 0 ; i < 3 ; ++i )
     {
+        y.sequence_send( { site: "site " + i, square: i*i } );
     }
     object_5.time_finish = "later";
     object_5.termination = "success";
