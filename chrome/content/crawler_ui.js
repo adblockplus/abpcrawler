@@ -34,61 +34,6 @@ let {Long_Task} = require( "task" );
 let {Crawler} = require( "crawler" );
 let {Logger} = require( "logger" );
 
-function onUnload_legacy()
-{
-    const fields = ["backend-url", "parallel-tabs"];
-    fields.forEach(
-        function( field )
-        {
-            let control = document.getElementById( field );
-            control.setAttribute( "value", control.value );
-        }
-    );
-}
-
-function getBackendUrl()
-{
-    let backendUrlTextBox = document.getElementById( "backend-url" );
-    return backendUrlTextBox.value;
-}
-
-function getParallelTabs()
-{
-    let parallelTabsTextBox = document.getElementById( "parallel-tabs" );
-    return parseInt( parallelTabsTextBox.value );
-}
-
-function onAccept()
-{
-    let backendUrl = getBackendUrl();
-    let parallelTabs = getParallelTabs();
-    let dialog = document.documentElement;
-    let acceptButton = dialog.getButton( "accept" );
-    crawling = acceptButton.disabled = true;
-
-    let mainWindow = window.opener;
-    if ( !mainWindow || mainWindow.closed )
-    {
-        alert( "Unable to find the main window, aborting." );
-        crawling = acceptButton.disabled = false;
-    }
-    else
-        Crawler.crawl_legacy( backendUrl, parallelTabs, mainWindow, function()
-        {
-            crawling = acceptButton.disabled = false;
-        } );
-
-    return false;
-}
-
-function onCancel()
-{
-    let closingPossible = !crawling;
-    if ( !closingPossible )
-        alert( "Crawling still in progress." );
-    return closingPossible;
-}
-
 //-------------------------------------------------------
 // New code
 //-------------------------------------------------------
