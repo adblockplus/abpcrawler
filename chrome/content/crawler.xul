@@ -24,36 +24,13 @@
     <script type="application/x-javascript;version=1.7" src="task_test_ui.js"/>
     <script type="application/x-javascript;version=1.7" src="sandbox_ui.js"/>
 
-    <tabbox selectedIndex="1">
+    <tabbox selectedIndex="0">
         <tabs>
-            <tab label="Legacy"/>
             <tab label="Crawler"/>
             <tab label="Long_Task Test"/>
             <tab label="Sandbox"/>
         </tabs>
         <tabpanels>
-            <tabpanel>
-                <vbox>
-                    <label control="backend-url" value="Crawl server URL"/>
-                    <textbox
-                            id="backend-url" value="https://www.adblockplus.org" flex="1"
-                            persist="value"/>
-                </vbox>
-                <vbox>
-                    <label control="parallel-tabs" value="Parallel Tabs"/>
-                    <textbox
-                            id="parallel-tabs" type="number" min="1" value="5"
-                            persist="value"/>
-                </vbox>
-                <spacer flex="1"/>
-                <vbox>
-                    <spacer flex="1"/>
-                    <button align="end"
-                            class="dialog"
-                            label="&crawl_start.label;"
-                            accesskey="&crawl_start.accesskey;"/>
-                </vbox>
-            </tabpanel>
             <tabpanel>
                 <vbox>
                     <groupbox>
@@ -110,7 +87,7 @@
                             </tabs>
                             <tabpanels>
                                 <tabpanel>
-                                    <label>Server</label>
+                                    <label>Server reporting not yet implemented.</label>
                                 </tabpanel>
                                 <tabpanel>
                                     <label>Local</label>
