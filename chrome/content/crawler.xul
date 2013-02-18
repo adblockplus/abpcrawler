@@ -24,10 +24,10 @@
     <script type="application/x-javascript;version=1.7" src="task_test_ui.js"/>
     <script type="application/x-javascript;version=1.7" src="sandbox_ui.js"/>
 
-    <tabbox selectedIndex="3">
+    <tabbox selectedIndex="1">
         <tabs>
             <tab label="Legacy"/>
-            <tab label="New Dialog"/>
+            <tab label="Crawler"/>
             <tab label="Long_Task Test"/>
             <tab label="Sandbox"/>
         </tabs>

@@ -29,7 +29,7 @@ function require( module )
     return result.exports;
 }
 let {Storage} = require( "storage" );
-let {Instruction} = require( "instruction" );
+let {Instruction, Instruction_Set} = require( "instruction" );
 let {Long_Task} = require( "task" );
 let {Crawler} = require( "crawler" );
 let {Logger} = require( "logger" );
@@ -165,7 +165,7 @@ function start_crawl()
         return false;
     }
     var storage = new Storage.Multiple( [ log_to_textbox, new Storage.Bit_Bucket()], true );
-    var instructions = Instruction.basic( browse_list, storage /* no other storage at present */ );
+    var instructions = new Instruction_Set.Basic( browse_list, storage /* no other storage at present */ );
 
     let mainWindow = window.opener;
     if ( !mainWindow || mainWindow.closed )
@@ -174,7 +174,7 @@ function start_crawl()
         log_window.log( "Unable to find the main window, aborting." );
         return false;
     }
-    current_crawler = new Crawler( instructions, log_window, mainWindow, leave_open() );
+    current_crawler = new Crawler( instructions, storage, log_window, mainWindow, leave_open() );
     current_crawl = new Long_Task( current_crawler );
     current_crawl.run();
     return true;
