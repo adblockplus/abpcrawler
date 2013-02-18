@@ -165,7 +165,7 @@ function start_crawl()
         return false;
     }
     var storage = new Storage.Multiple( [ log_to_textbox, new Storage.Bit_Bucket()], true );
-    var instructions = new Instruction_Set.Basic( browse_list, storage /* no other storage at present */ );
+    var instructions = new Instruction_Set.Basic( "Two-site tester", browse_list );
 
     let mainWindow = window.opener;
     if ( !mainWindow || mainWindow.closed )
