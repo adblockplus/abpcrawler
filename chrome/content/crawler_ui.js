@@ -111,6 +111,10 @@ function start_crawl()
     }
     var storage = new Storage.Multiple( [ log_to_textbox, new Storage.Bit_Bucket()], true );
     var instructions = new Instruction_Set.Basic( "Two-site tester", browse_list );
+    var outputs = [
+        { storage: log_to_textbox, encode: "YAML" },
+        { storage: new Storage.Bit_Bucket(), encode: "JSON" }
+    ];
 
     let mainWindow = window.opener;
     if ( !mainWindow || mainWindow.closed )
@@ -119,7 +123,7 @@ function start_crawl()
         log_window.log( "Unable to find the main window, aborting." );
         return false;
     }
-    current_crawler = new Crawler( instructions, storage, log_window, mainWindow, leave_open(), encoding );
+    current_crawler = new Crawler( instructions, outputs, log_window, mainWindow, leave_open() );
     current_crawl = new Long_Task( current_crawler );
     current_crawl.run();
     return true;
