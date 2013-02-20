@@ -14,7 +14,8 @@ function sandbox_start()
         output_box.value += s;
     };
 
-    var y = new Encoding.Format_stream( write, Encoding.YAML );
+    let formatter = new Encoding.YAML( write );
+    var y = new Encoding.Format_stream( formatter );
     y.logger.suppress( true );
 
     //-----------------------------------------------------------------------------------------
