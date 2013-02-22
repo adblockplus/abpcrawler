@@ -47,25 +47,6 @@ var base_name, base_name_initial_value;
 var output_directory, output_directory_initial_value;
 var save_output_in_preferences, save_output_in_preferences_initial_value;
 
-function icon_click()
-{
-    var fp = Cc["@mozilla.org/filepicker;1"].createInstance( Ci.nsIFilePicker );
-    fp.init( window, "Select a File", Ci.nsIFilePicker.modeGetFolder );
-    var result = fp.show();
-    switch ( result )
-    {
-        case Ci.nsIFilePicker.returnOK:
-            output_directory.value = fp.file.path;
-            break;
-        case Ci.nsIFilePicker.returnCancel:
-            break;
-        case Ci.nsIFilePicker.returnReplace:
-            break;
-        default:
-            break;
-    }
-}
-
 function loader()
 {
     go_button = document.getElementById( "crawl_go" );
@@ -130,6 +111,25 @@ function unloader()
     {
         current_crawl.close();
         current_crawl = null;
+    }
+}
+
+function icon_click()
+{
+    var fp = Cc["@mozilla.org/filepicker;1"].createInstance( Ci.nsIFilePicker );
+    fp.init( window, "Select a File", Ci.nsIFilePicker.modeGetFolder );
+    var result = fp.show();
+    switch ( result )
+    {
+        case Ci.nsIFilePicker.returnOK:
+            output_directory.value = fp.file.path;
+            break;
+        case Ci.nsIFilePicker.returnCancel:
+            break;
+        case Ci.nsIFilePicker.returnReplace:
+            break;
+        default:
+            break;
     }
 }
 
@@ -201,18 +201,37 @@ function start_crawl()
             return false;
     }
 
-    // Only permissible storage is the null one.
-    si = document.getElementById( "storage_tabbox" ).getAttribute( "selectedIndex" );
-    if ( si != 2 )
+    /*
+     * Outputs
+     */
+    var outputs = [
+        { storage: log_to_textbox, encode: "YAML" }
+    ];
+    si = document.getElementById( "storage_tabbox" ).selectedIndex;
+    switch ( si )
     {
-        log_window.log( "Temporary: May only use null. Aborted." );
-        return false;
+        case 0:
+            log_window.log( "Server storage not supported at present. Aborted." );
+            return false;
+        case 1:
+            var file = Cc["@mozilla.org/file/local;1"].createInstance( Ci.nsILocalFile );
+            file.initWithPath( output_directory.value );
+            file.append( base_name.value + "-" + "TEST" );
+            log_window.log( "Computed file name = " + file.path );
+            log_window.log( "Local storage not supported at present. Aborted." );
+            return false;
+        case 2:
+            /*
+             * This is in at present to ensure that the JSON encoder does not unexpectedly throw. We can take it out
+             * when we're assured that it doesn't.
+             */
+            outputs.push( { storage: new Storage.Bit_Bucket(), encode: "JSON" } );
+            break;
+        default:
+            log_window.log( "WTF? Unknown storage tab. Aborted. si=" + si );
+            return false;
     }
     var instructions = new Instruction_Set.Basic( "Two-site tester", browse_list );
-    var outputs = [
-        { storage: log_to_textbox, encode: "YAML" },
-        { storage: new Storage.Bit_Bucket(), encode: "JSON" }
-    ];
 
     let mainWindow = window.opener;
     if ( !mainWindow || mainWindow.closed )

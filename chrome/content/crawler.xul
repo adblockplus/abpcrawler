@@ -94,7 +94,7 @@
                                         <label>Write output to the local file system.</label>
                                         <hbox align="center">
                                             <label>Base Name</label>
-                                            <textbox id="base_name">crawl-results</textbox>
+                                            <textbox id="base_name" value="crawl-results"/>
                                         </hbox>
                                         <hbox align="center">
                                             <label>Directory</label>
