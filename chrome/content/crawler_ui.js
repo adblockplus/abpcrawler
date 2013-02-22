@@ -12,10 +12,11 @@
  */
 
 const Cu = Components.utils;
+const Cc = Components.classes;
+const Ci = Components.interfaces;
 
 Cu.import( "resource://gre/modules/Services.jsm" );
-
-let crawling = false;
+Cu.import( "resource://gre/modules/FileUtils.jsm" );
 
 function require( module )
 {
@@ -40,13 +41,79 @@ let {Logger} = require( "logger" );
 
 var current_crawler = null;
 var current_crawl = null;
+var preference_service, preference_branch;
 var go_button;
+var base_name, base_name_initial_value;
+var output_directory, output_directory_initial_value;
+var save_output_in_preferences, save_output_in_preferences_initial_value;
+
+function icon_click()
+{
+    var fp = Cc["@mozilla.org/filepicker;1"].createInstance( Ci.nsIFilePicker );
+    fp.init( window, "Select a File", Ci.nsIFilePicker.modeGetFolder );
+    var result = fp.show();
+    switch ( result )
+    {
+        case Ci.nsIFilePicker.returnOK:
+            output_directory.value = fp.file.path;
+            break;
+        case Ci.nsIFilePicker.returnCancel:
+            break;
+        case Ci.nsIFilePicker.returnReplace:
+            break;
+        default:
+            break;
+    }
+}
 
 function loader()
 {
     go_button = document.getElementById( "crawl_go" );
+    preference_service = Cc["@mozilla.org/preferences-service;1"].getService( Ci.nsIPrefService );
+    preference_branch = preference_service.getBranch( "extensions.abpcrawler." );
+
+    /*
+     * Set up the output directory values and preferences.
+     */
+    base_name = document.getElementById( "base_name" );
+    output_directory = document.getElementById( "output_directory" );
+    save_output_in_preferences = document.getElementById( "save_output_in_preferences" );
+
+    base_name_initial_value = base_name.value;
+    if ( preference_branch.prefHasUserValue( "base_name" ) )
+    {
+        base_name_initial_value = preference_branch.getCharPref( "base_name" );
+        base_name.value = base_name_initial_value;
+    }
+    else
+    {
+        base_name_initial_value = base_name.value;
+    }
+    if ( preference_branch.prefHasUserValue( "output_directory" ) )
+    {
+        output_directory_initial_value = preference_branch.getCharPref( "output_directory" );
+        output_directory.value = output_directory_initial_value;
+    }
+    else
+    {
+        output_directory_initial_value = "";
+        var dir = FileUtils.getDir( "Home", [] );
+        output_directory.value = dir.path;
+    }
+    if ( preference_branch.prefHasUserValue( "save_output_location" ) )
+    {
+        save_output_in_preferences_initial_value = preference_branch.getCharPref( "save_output_location" );
+        save_output_in_preferences.checked = save_output_in_preferences_initial_value;
+    }
+    else
+    {
+        save_output_in_preferences_initial_value = false;
+    }
+
+    document.getElementById( "output_directory_icon" ).addEventListener( "click", icon_click );
 }
 
+//noinspection JSUnusedGlobalSymbols
 function onShutdown()
 {
     unloader();
@@ -75,6 +142,38 @@ function start_crawl()
 {
     var log = crawler_ui_log;
     log( "Start crawl", false );
+
+    /*
+     * Save preferences automatically when we start a crawl.
+     */
+    if ( save_output_in_preferences.checked || save_output_in_preferences_initial_value )
+    {
+        var saving_basename = ( base_name_initial_value != base_name.value );
+        var saving_dir = ( output_directory.value != output_directory_initial_value );
+        var saving_saving = ( save_output_in_preferences.checked != save_output_in_preferences_initial_value );
+        if ( saving_basename )
+        {
+            preference_branch.setCharPref( "base_name", base_name.value );
+        }
+        if ( saving_dir )
+        {
+            preference_branch.setCharPref( "output_directory", output_directory.value );
+        }
+        if ( saving_saving )
+        {
+            preference_branch.setCharPref( "save_output_location", save_output_in_preferences.checked );
+        }
+        if ( saving_basename || saving_dir || saving_saving )
+        {
+            preference_service.savePrefFile( null );
+            /*
+             * Recalculate initial values only when saving.
+             */
+            base_name_initial_value = base_name.value;
+            output_directory_initial_value = output_directory.value;
+            save_output_in_preferences_initial_value = save_output_in_preferences.checked;
+        }
+    }
 
     var log_window = new Crawl_Display();
     var log_to_textbox = new Storage.Display_Log( log_window );
@@ -109,7 +208,6 @@ function start_crawl()
         log_window.log( "Temporary: May only use null. Aborted." );
         return false;
     }
-    var storage = new Storage.Multiple( [ log_to_textbox, new Storage.Bit_Bucket()], true );
     var instructions = new Instruction_Set.Basic( "Two-site tester", browse_list );
     var outputs = [
         { storage: log_to_textbox, encode: "YAML" },

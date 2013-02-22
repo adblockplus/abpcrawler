@@ -43,7 +43,7 @@
                             </tabs>
                             <tabpanels>
                                 <tabpanel>
-                                    <label>Retrieve from Server</label>
+                                    <label>Server instructions not implemented.</label>
                                 </tabpanel>
                                 <tabpanel>
                                     <label>Use Local File</label>
@@ -57,7 +57,7 @@
                     <groupbox>
                         <caption label="Tabs"/>
                         <vbox>
-                            <hbox>
+                            <hbox align="center">
                                 <label>Simultaneous Loads</label>
                                 <textbox
                                         id="number_of_tabs" type="number" min="1" value="5"
@@ -79,7 +79,7 @@
                     </groupbox>
                     <groupbox>
                         <caption label="Storage"/>
-                        <tabbox id="storage_tabbox" selectedIndex="2">
+                        <tabbox id="storage_tabbox" selectedIndex="1">
                             <tabs>
                                 <tab label="Server"/>
                                 <tab label="Local"/>
@@ -90,7 +90,26 @@
                                     <label>Server reporting not yet implemented.</label>
                                 </tabpanel>
                                 <tabpanel>
-                                    <label>Local</label>
+                                    <vbox>
+                                        <label>Write output to the local file system.</label>
+                                        <hbox align="center">
+                                            <label>Base Name</label>
+                                            <textbox id="base_name">crawl-results</textbox>
+                                        </hbox>
+                                        <hbox align="center">
+                                            <label>Directory</label>
+                                            <!-- Icon from http://openiconlibrary.sourceforge.net/ -->
+                                            <image id="output_directory_icon"
+                                                   src="chrome://abpcrawler/skin/folder.png"
+                                                   tooltiptext="Change the output directory"/>
+                                            <textbox id="output_directory"
+                                                     placeholder="&lt;current directory&gt;"
+                                                     size="60"/>
+                                        </hbox>
+                                        <checkbox id="save_output_in_preferences"
+                                                  label="Save base name and directory as preference"
+                                                  checked="false"/>
+                                    </vbox>
                                 </tabpanel>
                                 <tabpanel>
                                     <label>No Reporting.</label>
