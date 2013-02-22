@@ -5,3 +5,4 @@ syntax: glob
 *.pyc
 *.sh
 lib/storage@98.js
+crawl-results
