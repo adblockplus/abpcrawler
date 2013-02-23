@@ -188,14 +188,16 @@ function start_crawl()
     }
     var browse_list = ["yahoo.com", "ksl.com"];
 
-    var encoding = null;
+    var encoding = null, suffix = "";
     switch ( document.getElementById( "format" ).selectedIndex )
     {
         case 0:
             encoding = "JSON";
+            suffix = ".json";
             break;
         case 1:
             encoding = "YAML";
+            suffix = ".yaml";
             break;
         default:
             log_window.log( "Unknown output encoding. Aborted." );
@@ -217,7 +219,7 @@ function start_crawl()
         case 1:
             var file = Cc["@mozilla.org/file/local;1"].createInstance( Ci.nsILocalFile );
             file.initWithPath( output_directory.value );
-            file.append( base_name.value + "-" + "TEST" );
+            file.append( base_name.value + "-" + filename_timestamp() + suffix );
             log_window.log( "Computed file name = " + file.path );
             outputs.push( { storage: new Storage.Local_File( file ), encode: encoding } );
             break;
@@ -266,4 +268,11 @@ Crawl_Display.prototype.write = function( message )
 };
 
 crawler_ui_log = (new Logger( "crawler_ui" )).make_log();
+
+function filename_timestamp()
+{
+    var s = Logger.timestamp();
+    Cu.reportError( "timestamp = " + s );
+    return s.substr( 0, 10 ) + "_" + s.substr( 11, 2 ) + "=" + s.substr( 14,2 ) + "=" + s.substr( 17,2 );
+}
 
