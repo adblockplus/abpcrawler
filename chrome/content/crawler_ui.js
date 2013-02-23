@@ -168,6 +168,7 @@ function start_crawl()
             preference_service.savePrefFile( null );
             /*
              * Recalculate initial values only when saving.
+             * DEFECT: Works when save_output_in_preferences is checked, but can fail when it's not.
              */
             base_name_initial_value = base_name.value;
             output_directory_initial_value = output_directory.value;
@@ -218,8 +219,8 @@ function start_crawl()
             file.initWithPath( output_directory.value );
             file.append( base_name.value + "-" + "TEST" );
             log_window.log( "Computed file name = " + file.path );
-            log_window.log( "Local storage not supported at present. Aborted." );
-            return false;
+            outputs.push( { storage: new Storage.Local_File( file ), encode: encoding } );
+            break;
         case 2:
             /*
              * This is in at present to ensure that the JSON encoder does not unexpectedly throw. We can take it out
