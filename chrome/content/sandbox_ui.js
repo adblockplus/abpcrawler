@@ -27,6 +27,23 @@ var write = function( s )
 var logger = new Logger( "sandbox" );
 var log = logger.make_log();
 
+function wrapped_parse( s )
+{
+    try
+    {
+        return YAML.parse( s );
+    }
+    catch ( e if e instanceof YamlParseException )
+    {
+        write( "YamlParseException: " + e.message + "\n" );
+    }
+    catch ( e )
+    {
+        write( "Exception: " + e.toString() + "\nstack = " + e.stack + "\n" );
+    }
+    return null;
+}
+
 function exercise_YAML_input()
 {
     log( "Start YAML input" );
@@ -40,19 +57,28 @@ function exercise_YAML_input()
         + "    - yahoo.com\n"
         + "    - ksl.com\n"
         + "";
-    try
+    var x = wrapped_parse( s );
+    if ( x )
     {
-        var x = YAML.parse( s );
+        write( JSON.stringify( x ) );
+        write( "\n" );
     }
-    catch ( e if e instanceof YamlParseException )
+    //-----------------------------------------------------------------------------------------
+    write( "---\n" );
+    write( "# 1\n" );
+    s = ""
+        + "name: foo\n"
+        + "site:\n"
+        + "    - yahoo.com\n"
+        + "    error no array element mark\n"
+        + "    - ksl.com\n"
+        + "";
+    x = wrapped_parse( s );
+    if ( x )
     {
-        write( "YamlParseException: " + e.message );
+        write( JSON.stringify( x ) );
+        write( "\n" );
     }
-    catch ( e )
-    {
-        write( "Exception: " + e.toString() + "\nstack = " + e.stack );
-    }
-    write( JSON.stringify( x ) );
 }
 
 function exercise_Encoding()
