@@ -1,18 +1,63 @@
 let {Logger} = require( "logger" );
 let {Encoding} = require( "encoding" );
+let {YAML, YamlParseException} = require( "yaml" );
 
-var logger = new Logger( "sandbox" );
-
+var what = "YAML_input";
+var output_box;
 function sandbox_start()
 {
-    var log = logger.make_log();
-    log( "Start" );
-
-    var output_box = document.getElementById( "sandbox_output" );
-    var write = function( s )
+    output_box = document.getElementById( "sandbox_output" );
+    switch ( what )
     {
-        output_box.value += s;
-    };
+        case "Encoding":
+            exercise_Encoding();
+            break;
+        case "YAML_input":
+            exercise_YAML_input();
+            break;
+    }
+}
+
+var write = function( s )
+{
+    output_box.value += s;
+};
+
+
+var logger = new Logger( "sandbox" );
+var log = logger.make_log();
+
+function exercise_YAML_input()
+{
+    log( "Start YAML input" );
+
+    //-----------------------------------------------------------------------------------------
+    write( "---\n" );
+    write( "# 0\n" );
+    var s = ""
+        + "name: foo\n"
+        + "site:\n"
+        + "    - yahoo.com\n"
+        + "    - ksl.com\n"
+        + "";
+    try
+    {
+        var x = YAML.parse( s );
+    }
+    catch ( e if e instanceof YamlParseException )
+    {
+        write( "YamlParseException: " + e.message );
+    }
+    catch ( e )
+    {
+        write( "Exception: " + e.toString() + "\nstack = " + e.stack );
+    }
+    write( JSON.stringify( x ) );
+}
+
+function exercise_Encoding()
+{
+    log( "Start" );
 
     let formatter = new Encoding.YAML( write );
     var y = new Encoding.Format_stream( formatter );
@@ -136,7 +181,7 @@ function sandbox_start()
     y.sequence_start();
     for ( let i = 0 ; i < 3 ; ++i )
     {
-        y.sequence_send( { site: "site " + i, square: i*i } );
+        y.sequence_send( { site: "site " + i, square: i * i } );
     }
     object_5.time_finish = "later";
     object_5.termination = "success";
