@@ -44,6 +44,7 @@ var current_crawl = null;
 var preference_service, preference_branch;
 var go_button;
 var base_name, base_name_initial_value;
+var input_file, input_file_initial_value;
 var output_directory, output_directory_initial_value;
 var save_output_in_preferences, save_output_in_preferences_initial_value;
 
@@ -57,6 +58,7 @@ function loader()
      * Set up the output directory values and preferences.
      */
     base_name = document.getElementById( "base_name" );
+    input_file = document.getElementById( "input_file" );
     output_directory = document.getElementById( "output_directory" );
     save_output_in_preferences = document.getElementById( "save_output_in_preferences" );
 
@@ -91,7 +93,8 @@ function loader()
         save_output_in_preferences_initial_value = false;
     }
 
-    document.getElementById( "output_directory_icon" ).addEventListener( "click", icon_click );
+    document.getElementById( "input_file_icon" ).addEventListener( "click", icon_input_click );
+    document.getElementById( "output_directory_icon" ).addEventListener( "click", icon_output_click );
 }
 
 //noinspection JSUnusedGlobalSymbols
@@ -114,10 +117,28 @@ function unloader()
     }
 }
 
-function icon_click()
+function icon_input_click()
 {
     var fp = Cc["@mozilla.org/filepicker;1"].createInstance( Ci.nsIFilePicker );
-    fp.init( window, "Select a File", Ci.nsIFilePicker.modeGetFolder );
+    fp.init( window, "Select an Input File", Ci.nsIFilePicker.modeOpen );
+    var result = fp.show();
+    switch ( result )
+    {
+        case Ci.nsIFilePicker.returnOK:
+            break;
+        case Ci.nsIFilePicker.returnCancel:
+            break;
+        case Ci.nsIFilePicker.returnReplace:
+            break;
+        default:
+            break;
+    }
+}
+
+function icon_output_click()
+{
+    var fp = Cc["@mozilla.org/filepicker;1"].createInstance( Ci.nsIFilePicker );
+    fp.init( window, "Select an Output Folder", Ci.nsIFilePicker.modeGetFolder );
     var result = fp.show();
     switch ( result )
     {
@@ -186,8 +207,6 @@ function start_crawl()
         log_window.log( "Temporary: May only use fixed list. Aborted." );
         return false;
     }
-//    var browse_list = ["yahoo.com", "ksl.com"];
-//    var instructions = new Instruction_Set.Basic( "Two-site tester", browse_list );
     var fixed_source = ""
         + "name: Fixed internal development test\n"
         + "target:\n"
@@ -278,7 +297,6 @@ crawler_ui_log = (new Logger( "crawler_ui" )).make_log();
 function filename_timestamp()
 {
     var s = Logger.timestamp();
-    Cu.reportError( "timestamp = " + s );
     return "_" + s.substr( 0, 10 ) + "_" + s.substr( 11, 2 ) + "-" + s.substr( 14, 2 ) + "-" + s.substr( 17, 2 );
 }
 
