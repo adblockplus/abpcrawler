@@ -35,7 +35,7 @@
                 <vbox>
                     <groupbox>
                         <caption label="Instructions"/>
-                        <tabbox id="instructions_tabbox" selectedIndex="2">
+                        <tabbox id="instructions_tabbox" selectedIndex="1">
                             <tabs>
                                 <tab label="Server"/>
                                 <tab label="Local"/>
@@ -46,7 +46,19 @@
                                     <label>Server instructions not implemented.</label>
                                 </tabpanel>
                                 <tabpanel>
-                                    <label>Use Local File</label>
+                                    <vbox>
+                                        <label>Read input from the local file system.</label>
+                                        <hbox align="center">
+                                            <label>Input File</label>
+                                            <!-- Icon from http://openiconlibrary.sourceforge.net/ -->
+                                            <image id="input_file_icon"
+                                                   src="chrome://abpcrawler/skin/text-x-source.png"
+                                                   tooltiptext="Change the input file"/>
+                                            <textbox id="input_file"
+                                                     placeholder="&lt;current directory&gt;"
+                                                     size="60"/>
+                                        </hbox>
+                                    </vbox>
                                 </tabpanel>
                                 <tabpanel>
                                     <label>Use Fixed List</label>
