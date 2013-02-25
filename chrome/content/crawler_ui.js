@@ -30,7 +30,7 @@ function require( module )
     return result.exports;
 }
 let {Storage} = require( "storage" );
-let {Instruction, Instruction_Set} = require( "instruction" );
+let {Instruction, Instruction_Set, Input_String, Input_File} = require( "instruction" );
 let {Long_Task} = require( "task" );
 let {Crawler} = require( "crawler" );
 let {Logger} = require( "logger" );
@@ -186,7 +186,15 @@ function start_crawl()
         log_window.log( "Temporary: May only use fixed list. Aborted." );
         return false;
     }
-    var browse_list = ["yahoo.com", "ksl.com"];
+//    var browse_list = ["yahoo.com", "ksl.com"];
+//    var instructions = new Instruction_Set.Basic( "Two-site tester", browse_list );
+    var fixed_source = ""
+        + "name: Fixed internal development test\n"
+        + "target:\n"
+        + "    - yahoo.com\n"
+        + "    - ksl.com\n"
+        + "";
+    var instructions = new Instruction_Set.Parsed( new Input_String( fixed_source ) );
 
     var encoding = null, suffix = "";
     switch ( document.getElementById( "format" ).selectedIndex )
@@ -234,12 +242,10 @@ function start_crawl()
             log_window.log( "WTF? Unknown storage tab. Aborted. si=" + si );
             return false;
     }
-    var instructions = new Instruction_Set.Basic( "Two-site tester", browse_list );
 
     let mainWindow = window.opener;
     if ( !mainWindow || mainWindow.closed )
     {
-        Cu.reportError( "Unable to find the main window, aborting." );
         log_window.log( "Unable to find the main window, aborting." );
         return false;
     }
@@ -273,6 +279,6 @@ function filename_timestamp()
 {
     var s = Logger.timestamp();
     Cu.reportError( "timestamp = " + s );
-    return "_" + s.substr( 0, 10 ) + "_" + s.substr( 11, 2 ) + "-" + s.substr( 14,2 ) + "-" + s.substr( 17,2 );
+    return "_" + s.substr( 0, 10 ) + "_" + s.substr( 11, 2 ) + "-" + s.substr( 14, 2 ) + "-" + s.substr( 17, 2 );
 }
 
