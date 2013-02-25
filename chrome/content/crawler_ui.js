@@ -219,7 +219,7 @@ function start_crawl()
         case 1:
             var file = Cc["@mozilla.org/file/local;1"].createInstance( Ci.nsILocalFile );
             file.initWithPath( output_directory.value );
-            file.append( base_name.value + "-" + filename_timestamp() + suffix );
+            file.append( base_name.value + filename_timestamp() + suffix );
             log_window.log( "Computed file name = " + file.path );
             outputs.push( { storage: new Storage.Local_File( file ), encode: encoding } );
             break;
@@ -273,6 +273,6 @@ function filename_timestamp()
 {
     var s = Logger.timestamp();
     Cu.reportError( "timestamp = " + s );
-    return s.substr( 0, 10 ) + "_" + s.substr( 11, 2 ) + "=" + s.substr( 14,2 ) + "=" + s.substr( 17,2 );
+    return "_" + s.substr( 0, 10 ) + "_" + s.substr( 11, 2 ) + "-" + s.substr( 14,2 ) + "-" + s.substr( 17,2 );
 }
 
