@@ -46,7 +46,6 @@ var go_button;
 var base_name, base_name_initial_value;
 var input_file, input_file_initial_value;
 var output_directory, output_directory_initial_value;
-var save_output_in_preferences, save_output_in_preferences_initial_value;
 
 function loader()
 {
@@ -57,11 +56,15 @@ function loader()
     /*
      * Set up the output directory values and preferences.
      */
-    base_name = document.getElementById( "base_name" );
     input_file = document.getElementById( "input_file" );
+    base_name = document.getElementById( "base_name" );
     output_directory = document.getElementById( "output_directory" );
-    save_output_in_preferences = document.getElementById( "save_output_in_preferences" );
 
+    if ( preference_branch.prefHasUserValue( "input_file" ) )
+    {
+        input_file_initial_value = preference_branch.getCharPref( "input_file" );
+        input_file.value = input_file_initial_value;
+    }
     base_name_initial_value = base_name.value;
     if ( preference_branch.prefHasUserValue( "base_name" ) )
     {
@@ -82,15 +85,6 @@ function loader()
         output_directory_initial_value = "";
         var dir = FileUtils.getDir( "Home", [] );
         output_directory.value = dir.path;
-    }
-    if ( preference_branch.prefHasUserValue( "save_output_location" ) )
-    {
-        save_output_in_preferences_initial_value = preference_branch.getCharPref( "save_output_location" );
-        save_output_in_preferences.checked = save_output_in_preferences_initial_value;
-    }
-    else
-    {
-        save_output_in_preferences_initial_value = false;
     }
 
     document.getElementById( "input_file_icon" ).addEventListener( "click", icon_input_click );
@@ -121,10 +115,31 @@ function icon_input_click()
 {
     var fp = Cc["@mozilla.org/filepicker;1"].createInstance( Ci.nsIFilePicker );
     fp.init( window, "Select an Input File", Ci.nsIFilePicker.modeOpen );
+    if ( input_file.value != "" && input_file.value != null )
+    {
+        var f = new FileUtils.File( input_file.value );
+        var s = null;
+        if ( f.exists() )
+        {
+            if ( f.isFile() )
+            {
+                f = f.parent;
+            }
+            if ( f.isDirectory() )
+            {
+                fp.displayDirectory = f;
+            }
+        }
+    }
     var result = fp.show();
     switch ( result )
     {
         case Ci.nsIFilePicker.returnOK:
+            f = fp.file;
+            if ( f.isFile() )
+            {
+                input_file.value = fp.file.path;
+            }
             break;
         case Ci.nsIFilePicker.returnCancel:
             break;
@@ -167,36 +182,25 @@ function start_crawl()
     /*
      * Save preferences automatically when we start a crawl.
      */
-    if ( save_output_in_preferences.checked || save_output_in_preferences_initial_value )
+    var saving_basename = ( base_name_initial_value != base_name.value );
+    var saving_dir = ( output_directory.value != output_directory_initial_value );
+    if ( saving_basename )
     {
-        var saving_basename = ( base_name_initial_value != base_name.value );
-        var saving_dir = ( output_directory.value != output_directory_initial_value );
-        var saving_saving = ( save_output_in_preferences.checked != save_output_in_preferences_initial_value );
-        if ( saving_basename )
-        {
-            preference_branch.setCharPref( "base_name", base_name.value );
-        }
-        if ( saving_dir )
-        {
-            preference_branch.setCharPref( "output_directory", output_directory.value );
-        }
-        if ( saving_saving )
-        {
-            preference_branch.setCharPref( "save_output_location", save_output_in_preferences.checked );
-        }
-        if ( saving_basename || saving_dir || saving_saving )
-        {
-            preference_service.savePrefFile( null );
-            /*
-             * Recalculate initial values only when saving.
-             * DEFECT: Works when save_output_in_preferences is checked, but can fail when it's not.
-             */
-            base_name_initial_value = base_name.value;
-            output_directory_initial_value = output_directory.value;
-            save_output_in_preferences_initial_value = save_output_in_preferences.checked;
-        }
+        preference_branch.setCharPref( "base_name", base_name.value );
     }
-
+    if ( saving_dir )
+    {
+        preference_branch.setCharPref( "output_directory", output_directory.value );
+    }
+    if ( saving_basename || saving_dir )
+    {
+        preference_service.savePrefFile( null );
+        /*
+         * Recalculate initial values only when saving.
+         */
+        base_name_initial_value = base_name.value;
+        output_directory_initial_value = output_directory.value;
+    }
     var log_window = new Crawl_Display();
     var log_to_textbox = new Storage.Display_Log( log_window );
 
