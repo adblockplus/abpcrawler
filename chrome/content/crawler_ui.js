@@ -182,8 +182,13 @@ function start_crawl()
     /*
      * Save preferences automatically when we start a crawl.
      */
+    var saving_input = ( input_file_initial_value != input_file.value );
     var saving_basename = ( base_name_initial_value != base_name.value );
     var saving_dir = ( output_directory.value != output_directory_initial_value );
+    if ( saving_input )
+    {
+        preference_branch.setCharPref( "input_file", input_file.value );
+    }
     if ( saving_basename )
     {
         preference_branch.setCharPref( "base_name", base_name.value );
@@ -192,12 +197,13 @@ function start_crawl()
     {
         preference_branch.setCharPref( "output_directory", output_directory.value );
     }
-    if ( saving_basename || saving_dir )
+    if ( saving_input || saving_basename || saving_dir )
     {
         preference_service.savePrefFile( null );
         /*
          * Recalculate initial values only when saving.
          */
+        input_file_initial_value = input_file.value;
         base_name_initial_value = base_name.value;
         output_directory_initial_value = output_directory.value;
     }
