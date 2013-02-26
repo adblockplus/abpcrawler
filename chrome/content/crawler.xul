@@ -55,7 +55,7 @@
                                                    src="chrome://abpcrawler/skin/text-x-source.png"
                                                    tooltiptext="Change the input file"/>
                                             <textbox id="input_file"
-                                                     placeholder="&lt;current directory&gt;"
+                                                     placeholder="&lt;no input file&gt;"
                                                      size="60"/>
                                         </hbox>
                                     </vbox>
@@ -118,9 +118,6 @@
                                                      placeholder="&lt;current directory&gt;"
                                                      size="60"/>
                                         </hbox>
-                                        <checkbox id="save_output_in_preferences"
-                                                  label="Save base name and directory as preference"
-                                                  checked="false"/>
                                     </vbox>
                                 </tabpanel>
                                 <tabpanel>

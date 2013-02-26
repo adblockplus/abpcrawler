@@ -6,3 +6,4 @@ syntax: glob
 *.sh
 lib/storage@98.js
 crawl-results
+crawl-source
