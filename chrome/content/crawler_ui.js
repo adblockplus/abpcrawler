@@ -210,21 +210,48 @@ function start_crawl()
     var log_window = new Crawl_Display();
     var log_to_textbox = new Storage.Display_Log( log_window );
 
-    // Only permissible input is the fixed one.
-    var si = document.getElementById( "instructions_tabbox" ).getAttribute( "selectedIndex" );
-    if ( si != 2 )
+    /*
+     * Input
+     */
+    var instructions;
+    var si = document.getElementById( "instructions_tabbox" ).selectedIndex;
+    switch ( si )
     {
-        log_window.log( "Temporary: May only use fixed list. Aborted." );
-        return false;
+        case 0:
+            log_window.log( "Server input not supported at present. Aborted." );
+            return false;
+        case 1:
+            var f = new FileUtils.File( input_file.value );
+            if ( !f.exists() )
+            {
+                log_window.log( "Input file does not exist. name = " + f.path );
+                return false;
+            }
+            if ( !f.isFile() )
+            {
+                log_window.log( "Input does not name a file. name = " + f.path );
+                return false;
+            }
+            instructions = new Instruction_Set.Parsed( new Input_File( f ) );
+            break;
+        case 2:
+            var fixed_source = ""
+                + "name: Fixed internal development test\n"
+                + "target:\n"
+                + "    - yahoo.com\n"
+                + "    - ksl.com\n"
+                + "";
+            instructions = new Instruction_Set.Parsed( new Input_String( fixed_source ) );
+            break;
+        default:
+            log_window.log( "WTF? Unknown input tab. Aborted. si=" + si );
+            return false;
     }
-    var fixed_source = ""
-        + "name: Fixed internal development test\n"
-        + "target:\n"
-        + "    - yahoo.com\n"
-        + "    - ksl.com\n"
-        + "";
-    var instructions = new Instruction_Set.Parsed( new Input_String( fixed_source ) );
+    // Assert 'instructions' contains a valid 'Instruction_Set' object
 
+    /*
+     * Encoding
+     */
     var encoding = null, suffix = "";
     switch ( document.getElementById( "format" ).selectedIndex )
     {
@@ -242,7 +269,7 @@ function start_crawl()
     }
 
     /*
-     * Outputs
+     * Output
      */
     var outputs = [
         { storage: log_to_textbox, encode: "YAML" }
