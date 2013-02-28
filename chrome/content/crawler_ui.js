@@ -44,6 +44,7 @@ var current_crawl = null;
 var preference_service, preference_branch;
 var go_button;
 var base_name, base_name_initial_value;
+var number_of_tabs;
 var input_file, input_file_initial_value;
 var output_directory, output_directory_initial_value;
 
@@ -250,6 +251,12 @@ function start_crawl()
     // Assert 'instructions' contains a valid 'Instruction_Set' object
 
     /*
+     * Tab configuration
+     */
+    number_of_tabs = document.getElementById( "number_of_tabs" );
+    // preference initialization goes here.
+
+    /*
      * Encoding
      */
     var encoding = null, suffix = "";
@@ -305,7 +312,7 @@ function start_crawl()
         log_window.log( "Unable to find the main window, aborting." );
         return false;
     }
-    current_crawler = new Crawler( instructions, outputs, log_window, mainWindow, leave_open() );
+    current_crawler = new Crawler( instructions, outputs, log_window, mainWindow, leave_open(), number_of_tabs.value );
     current_crawl = new Long_Task( current_crawler );
     current_crawl.run();
     return true;
