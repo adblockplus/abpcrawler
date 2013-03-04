@@ -92,12 +92,6 @@ function loader()
     document.getElementById( "output_directory_icon" ).addEventListener( "click", icon_output_click );
 }
 
-//noinspection JSUnusedGlobalSymbols
-function onShutdown()
-{
-    unloader();
-}
-
 function unloader()
 {
     if ( current_crawler )
