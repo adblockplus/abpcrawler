@@ -113,7 +113,6 @@ function icon_input_click()
     if ( input_file.value != "" && input_file.value != null )
     {
         var f = new FileUtils.File( input_file.value );
-        var s = null;
         if ( f.exists() )
         {
             if ( f.isFile() )
@@ -306,7 +305,10 @@ function start_crawl()
         log_window.log( "Unable to find the main window, aborting." );
         return false;
     }
-    current_crawler = new Crawler( instructions, outputs, log_window, mainWindow, leave_open(), number_of_tabs.value );
+    current_crawler = new Crawler(
+        instructions, outputs, log_window, mainWindow,
+        leave_open(), number_of_tabs.value, new Progress( instructions.size )
+    );
     current_crawl = new Long_Task( current_crawler );
     current_crawl.run();
     return true;
@@ -338,3 +340,13 @@ function filename_timestamp()
     return "_" + s.substr( 0, 10 ) + "_" + s.substr( 11, 2 ) + "-" + s.substr( 14, 2 ) + "-" + s.substr( 17, 2 );
 }
 
+var Progress = function( n_instructions )
+{
+    this.total = n_instructions;
+    this.progress_message = document.getElementById( "progress" );
+};
+
+Progress.prototype.notice = function( x )
+{
+    this.progress_message.value = x.active + "/" + x.completed + "/" + this.total;
+};

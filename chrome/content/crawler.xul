@@ -85,8 +85,8 @@
                     <groupbox>
                         <caption label="Output Format"/>
                         <radiogroup id="format">
-                            <radio id="json" label="JSON"/>
-                            <radio id="yaml" label="YAML" selected="true"/>
+                            <radio id="json" label="JSON" selected="true"/>
+                            <radio id="yaml" label="YAML"/>
                         </radiogroup>
                     </groupbox>
                     <groupbox>
@@ -130,12 +130,21 @@
                             oncommand="start_crawl();"
                             align="end" class="dialog"
                             label="&crawl_start.label;"/>
+                    <spacer flex="1"/>
+                    <hbox>
+                        <label id="lower_left"></label>
+                    </hbox>
                 </vbox>
                 <vbox>
-                    <checkbox id="display_log"
-                              label="Display log"
-                              disabled="true"
-                              checked="true"/>
+                    <hbox>
+                        <checkbox id="display_log"
+                                  label="Display log"
+                                  disabled="true"
+                                  checked="true"/>
+                        <spacer flex="1"/>
+                        <label value="Active/Completed/Total"/>
+                        <label id="progress"></label>
+                    </hbox>
                     <textbox id="log_box"
                              multiline="true" cols="132" rows="40" wrap="off"
                              readonly="true"
