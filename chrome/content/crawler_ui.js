@@ -315,8 +315,9 @@ function start_crawl()
     return true;
 }
 
-function crawl_catch()
+function crawl_catch( ex )
 {
+    crawler_ui_log( "crawl exception=" + ex.toString() );
 }
 
 function crawl_finally()
