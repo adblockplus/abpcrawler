@@ -319,6 +319,7 @@ function start_crawl()
  */
 function Crawl_Display()
 {
+    this.display_log = document.getElementById( "display_log" );
     this.log_box = document.getElementById( "log_box" );
 }
 
@@ -329,7 +330,8 @@ Crawl_Display.prototype.log = function( message )
 
 Crawl_Display.prototype.write = function( message )
 {
-    this.log_box.value += message;
+    if ( this.display_log.checked )
+        this.log_box.value += message;
 };
 
 crawler_ui_log = (new Logger( "crawler_ui" )).make_log();
@@ -344,6 +346,7 @@ var Progress = function( n_instructions )
 {
     this.total = n_instructions;
     this.progress_message = document.getElementById( "progress" );
+    document.getElementById( "progress_label" ).value = "Active/Completed/Total";
 };
 
 Progress.prototype.notice = function( x )
