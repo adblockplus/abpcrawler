@@ -138,12 +138,11 @@
                 <vbox>
                     <hbox>
                         <checkbox id="display_log"
-                                  label="Display log"
-                                  disabled="true"
-                                  checked="true"/>
+                                  label="Display output as it's generated"
+                                  checked="false"/>
                         <spacer flex="1"/>
-                        <label value="Active/Completed/Total"/>
-                        <label id="progress"></label>
+                        <label id="progress_label"/>
+                        <label id="progress"/>
                     </hbox>
                     <textbox id="log_box"
                              multiline="true" cols="132" rows="40" wrap="off"
