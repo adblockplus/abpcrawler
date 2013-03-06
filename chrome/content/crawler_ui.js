@@ -47,9 +47,11 @@ var base_name, base_name_initial_value;
 var number_of_tabs;
 var input_file, input_file_initial_value;
 var output_directory, output_directory_initial_value;
+var log_window;
 
 function loader()
 {
+    log_window = new Crawl_Display();
     go_button = document.getElementById( "crawl_go" );
     preference_service = Cc["@mozilla.org/preferences-service;1"].getService( Ci.nsIPrefService );
     preference_branch = preference_service.getBranch( "extensions.abpcrawler." );
@@ -201,7 +203,6 @@ function start_crawl()
         base_name_initial_value = base_name.value;
         output_directory_initial_value = output_directory.value;
     }
-    var log_window = new Crawl_Display();
     var log_to_textbox = new Storage.Display_Log( log_window );
 
     /*
@@ -310,8 +311,18 @@ function start_crawl()
         leave_open(), number_of_tabs.value, new Progress( instructions.size )
     );
     current_crawl = new Long_Task( current_crawler );
-    current_crawl.run();
+    current_crawl.run( crawl_finally, crawl_catch );
     return true;
+}
+
+function crawl_catch()
+{
+}
+
+function crawl_finally()
+{
+    crawler_ui_log( "Done" );
+    log_window.log( "Done" );
 }
 
 /**
