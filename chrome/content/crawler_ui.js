@@ -34,6 +34,7 @@ let {Instruction, Instruction_Set, Input_String, Input_File} = require( "instruc
 let {Long_Task} = require( "task" );
 let {Crawler} = require( "crawler" );
 let {Logger} = require( "logger" );
+let { Application_Session } = require( "application" );
 
 //-------------------------------------------------------
 // New code
@@ -306,12 +307,15 @@ function start_crawl()
         log_window.log( "Unable to find the main window, aborting." );
         return false;
     }
-    current_crawler = new Crawler(
+
+    var session = new Application_Session(
         instructions, outputs, log_window, mainWindow,
         leave_open(), number_of_tabs.value, new Progress( instructions.size )
     );
-    current_crawl = new Long_Task( current_crawler );
-    current_crawl.run( crawl_finally, crawl_catch );
+    session.run( crawl_finally, crawl_catch );
+    session = null;
+
+    // This function is an event handler.
     return true;
 }
 
