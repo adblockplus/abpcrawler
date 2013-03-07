@@ -48,11 +48,12 @@ var base_name, base_name_initial_value;
 var number_of_tabs;
 var input_file, input_file_initial_value;
 var output_directory, output_directory_initial_value;
-var log_window;
+var log_window, progress_message;
 
 function loader()
 {
     log_window = new Crawl_Display();
+    progress_message = document.getElementById( "progress" );
     go_button = document.getElementById( "crawl_go" );
     preference_service = Cc["@mozilla.org/preferences-service;1"].getService( Ci.nsIPrefService );
     preference_branch = preference_service.getBranch( "extensions.abpcrawler." );
@@ -308,9 +309,16 @@ function start_crawl()
         return false;
     }
 
+    // Initialize fixed part of the progress message
+    document.getElementById( "progress_label" ).value = "Active/Completed/Total";
+
     var session = new Application_Session(
         instructions, outputs, log_window, mainWindow,
-        leave_open(), number_of_tabs.value, new Progress( instructions.size )
+        leave_open(), number_of_tabs.value,
+        function( x )
+        {
+            progress_message.value = x.active + "/" + x.completed + "/" + x.total;
+        }
     );
     session.run( crawl_finally, crawl_catch );
     session = null;
@@ -358,14 +366,3 @@ function filename_timestamp()
     return "_" + s.substr( 0, 10 ) + "_" + s.substr( 11, 2 ) + "-" + s.substr( 14, 2 ) + "-" + s.substr( 17, 2 );
 }
 
-var Progress = function( n_instructions )
-{
-    this.total = n_instructions;
-    this.progress_message = document.getElementById( "progress" );
-    document.getElementById( "progress_label" ).value = "Active/Completed/Total";
-};
-
-Progress.prototype.notice = function( x )
-{
-    this.progress_message.value = x.active + "/" + x.completed + "/" + this.total;
-};
