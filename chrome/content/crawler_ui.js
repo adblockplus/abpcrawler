@@ -40,8 +40,7 @@ let { Application_Session } = require( "application" );
 // New code
 //-------------------------------------------------------
 
-var current_crawler = null;
-var current_crawl = null;
+var current_session = null;
 var preference_service, preference_branch;
 var go_button;
 var base_name, base_name_initial_value;
@@ -98,15 +97,11 @@ function loader()
 
 function unloader()
 {
-    if ( current_crawler )
+    Cu.reportError( "crawler_ui: Unloading." );
+    if ( current_session )
     {
-        current_crawler.close();
-        current_crawler = null;
-    }
-    if ( current_crawl )
-    {
-        current_crawl.close();
-        current_crawl = null;
+        current_session.close();
+        current_session = null;
     }
 }
 
@@ -274,9 +269,7 @@ function start_crawl()
     /*
      * Output
      */
-    var outputs = [
-        { storage: log_to_textbox, encode: "YAML" }
-    ];
+    var outputs = [];
     si = document.getElementById( "storage_tabbox" ).selectedIndex;
     switch ( si )
     {
@@ -312,7 +305,7 @@ function start_crawl()
     // Initialize fixed part of the progress message
     document.getElementById( "progress_label" ).value = "Active/Completed/Total";
 
-    var session = new Application_Session(
+    current_session = new Application_Session(
         instructions, outputs, log_window, mainWindow,
         leave_open(), number_of_tabs.value,
         function( x )
@@ -320,8 +313,10 @@ function start_crawl()
             progress_message.value = x.active + "/" + x.completed + "/" + x.total;
         }
     );
-    session.run( crawl_finally, crawl_catch );
-    session = null;
+    current_session.add_output( log_to_textbox, "YAML" );
+
+    current_session.run( crawl_finally, crawl_catch );
+    current_session = null;
 
     // This function is an event handler.
     return true;
