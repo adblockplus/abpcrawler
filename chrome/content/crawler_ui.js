@@ -29,16 +29,15 @@ function require( module )
     }
     return result.exports;
 }
-let {Storage} = require( "storage" );
-let {Instruction, Instruction_Set, Input_String, Input_File} = require( "instruction" );
-let {Long_Task} = require( "task" );
-let {Crawler} = require( "crawler" );
-let {Logger} = require( "logger" );
+let { Storage } = require( "storage" );
+let { Logger } = require( "logger" );
 let { Application_Session } = require( "application" );
 
 //-------------------------------------------------------
-// New code
+// Globals and Handlers
 //-------------------------------------------------------
+
+var crawler_ui_log = (new Logger( "crawler_ui" )).make_log();
 
 var current_session = null;
 var preference_service, preference_branch;
@@ -97,7 +96,7 @@ function loader()
 
 function unloader()
 {
-    Cu.reportError( "crawler_ui: Unloading." );
+    crawler_ui_log( "Unloading." );
     if ( current_session )
     {
         current_session.close();
@@ -162,10 +161,12 @@ function icon_output_click()
     }
 }
 
+//-------------------------------------------------------
+// Start Crawl
+//-------------------------------------------------------
 function start_crawl()
 {
-    var log = crawler_ui_log;
-    log( "Start crawl", false );
+    crawler_ui_log( "Start" );
 
     /*
      * Save preferences automatically when we start a crawl.
@@ -227,8 +228,6 @@ function start_crawl()
     /*
      * Miscellaneous
      */
-    number_of_tabs = document.getElementById( "number_of_tabs" ).value;
-    var leave_open = document.getElementById( "leave_open" ).checked;
     // Initialize fixed part of the progress message
     document.getElementById( "progress_label" ).value = "Active/Completed/Total";
 
@@ -237,8 +236,9 @@ function start_crawl()
      * of specifying them.
      */
     current_session = new Application_Session(
-        null, mainWindow,
-        leave_open, number_of_tabs,
+        mainWindow,
+        document.getElementById( "leave_open" ).checked,
+        document.getElementById( "number_of_tabs" ).value,
         function( x )
         {
             progress_message.value = x.active + "/" + x.completed + "/" + x.total;
@@ -316,7 +316,6 @@ function start_crawl()
     }
 
     current_session.run( crawl_finally, crawl_catch );
-    current_session = null;
 
     // This function is an event handler.
     return true;
@@ -329,10 +328,14 @@ function crawl_catch( ex )
 
 function crawl_finally()
 {
-    crawler_ui_log( "Done" );
-    log_window.log( "Done" );
+    crawler_ui_log( "Finish" );
+    log_window.log( "Finish" );
+    current_session = null;
 }
 
+//-------------------------------------------------------
+// Crawl_Display
+//-------------------------------------------------------
 /**
  * Constructor for a display object for the crawler.
  */
@@ -352,5 +355,3 @@ Crawl_Display.prototype.write = function( message )
     if ( this.display_log.checked )
         this.log_box.value += message;
 };
-
-crawler_ui_log = (new Logger( "crawler_ui" )).make_log();
