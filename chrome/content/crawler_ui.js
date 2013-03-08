@@ -299,11 +299,18 @@ function start_crawl()
             log_window.log( "Server storage not supported at present. Aborted." );
             return false;
         case 1:
-            var file = Cc["@mozilla.org/file/local;1"].createInstance( Ci.nsILocalFile );
-            file.initWithPath( output_directory.value );
-            file.append( base_name.value + filename_timestamp() + suffix );
-            log_window.log( "Computed file name = " + file.path );
-            current_session.add_output( new Storage.Local_File( file ), encoding );
+            try
+            {
+                var output_file_name =
+                    current_session.add_output_file( output_directory.value, base_name.value, true, encoding );
+            }
+            catch ( e )
+            {
+                log_window.log( e.message );
+                Cu.reportError( e.message );
+                return false;
+            }
+            log_window.log( "Computed file name = " + output_file_name );
             break;
         case 2:
             // Tab: No output.
@@ -312,7 +319,6 @@ function start_crawl()
             log_window.log( "WTF? Unknown storage tab. Aborted. si=" + si );
             return false;
     }
-
 
     current_session.run( crawl_finally, crawl_catch );
     current_session = null;
