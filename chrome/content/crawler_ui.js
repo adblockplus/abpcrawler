@@ -162,11 +162,6 @@ function icon_output_click()
     }
 }
 
-function leave_open()
-{
-    return document.getElementById( "leave_open" ).checked;
-}
-
 function start_crawl()
 {
     var log = crawler_ui_log;
@@ -203,63 +198,16 @@ function start_crawl()
     var log_to_textbox = new Storage.Display_Log( log_window );
 
     /*
-     * Input
-     */
-    var instructions;
-    var si = document.getElementById( "instructions_tabbox" ).selectedIndex;
-    switch ( si )
-    {
-        case 0:
-            log_window.log( "Server input not supported at present. Aborted." );
-            return false;
-        case 1:
-            var f = new FileUtils.File( input_file.value );
-            if ( !f.exists() )
-            {
-                log_window.log( "Input file does not exist. name = " + f.path );
-                return false;
-            }
-            if ( !f.isFile() )
-            {
-                log_window.log( "Input does not name a file. name = " + f.path );
-                return false;
-            }
-            instructions = new Instruction_Set.Parsed( new Input_File( f ) );
-            break;
-        case 2:
-            var fixed_source = ""
-                + "name: Fixed internal development test\n"
-                + "target:\n"
-                + "    - yahoo.com\n"
-                + "    - ksl.com\n"
-                + "";
-            instructions = new Instruction_Set.Parsed( new Input_String( fixed_source ) );
-            break;
-        default:
-            log_window.log( "WTF? Unknown input tab. Aborted. si=" + si );
-            return false;
-    }
-    // Assert 'instructions' contains a valid 'Instruction_Set' object
-
-    /*
-     * Tab configuration
-     */
-    number_of_tabs = document.getElementById( "number_of_tabs" );
-    // preference initialization goes here.
-
-    /*
      * Encoding
      */
-    var encoding = null, suffix = "";
+    var encoding = null;
     switch ( document.getElementById( "format" ).selectedIndex )
     {
         case 0:
             encoding = "JSON";
-            suffix = ".json";
             break;
         case 1:
             encoding = "YAML";
-            suffix = ".yaml";
             break;
         default:
             log_window.log( "Unknown output encoding. Aborted." );
@@ -276,12 +224,21 @@ function start_crawl()
         return false;
     }
 
+    /*
+     * Miscellaneous
+     */
+    number_of_tabs = document.getElementById( "number_of_tabs" ).value;
+    var leave_open = document.getElementById( "leave_open" ).checked;
     // Initialize fixed part of the progress message
     document.getElementById( "progress_label" ).value = "Active/Completed/Total";
 
+    /*
+     * Session. Note that we create the session object before the outputs, since the session class has multiple ways
+     * of specifying them.
+     */
     current_session = new Application_Session(
-        instructions, mainWindow,
-        leave_open(), number_of_tabs.value,
+        null, mainWindow,
+        leave_open, number_of_tabs,
         function( x )
         {
             progress_message.value = x.active + "/" + x.completed + "/" + x.total;
@@ -289,11 +246,51 @@ function start_crawl()
     );
 
     /*
+     * Input
+     */
+    switch ( document.getElementById( "instructions_tabbox" ).selectedIndex )
+    {
+        case 0:
+            log_window.log( "Server input not supported at present. Aborted." );
+            return false;
+        case 1:
+            try
+            {
+                current_session.set_input_file( input_file.value );
+            }
+            catch ( e )
+            {
+                log_window.log( e.message );
+                return false;
+            }
+            break;
+        case 2:
+            var fixed_source = ""
+                + "name: Fixed internal development test\n"
+                + "target:\n"
+                + "    - yahoo.com\n"
+                + "    - ksl.com\n"
+                + "";
+            try
+            {
+                current_session.set_input_string( fixed_source );
+            }
+            catch ( e )
+            {
+                log_window.log( e.message );
+                return false;
+            }
+            break;
+        default:
+            log_window.log( "WTF? Unknown input tab. Aborted." );
+            return false;
+    }
+
+    /*
      * Output
      */
     current_session.add_output( log_to_textbox, "YAML" );
-    si = document.getElementById( "storage_tabbox" ).selectedIndex;
-    switch ( si )
+    switch ( document.getElementById( "storage_tabbox" ).selectedIndex )
     {
         case 0:
             log_window.log( "Server storage not supported at present. Aborted." );
@@ -307,16 +304,14 @@ function start_crawl()
             catch ( e )
             {
                 log_window.log( e.message );
-                Cu.reportError( e.message );
                 return false;
             }
             log_window.log( "Computed file name = " + output_file_name );
             break;
         case 2:
-            // Tab: No output.
             break;
         default:
-            log_window.log( "WTF? Unknown storage tab. Aborted. si=" + si );
+            log_window.log( "WTF? Unknown storage tab. Aborted." );
             return false;
     }
 
