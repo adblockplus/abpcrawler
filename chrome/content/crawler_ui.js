@@ -267,34 +267,8 @@ function start_crawl()
     }
 
     /*
-     * Output
+     * Window
      */
-    var outputs = [];
-    si = document.getElementById( "storage_tabbox" ).selectedIndex;
-    switch ( si )
-    {
-        case 0:
-            log_window.log( "Server storage not supported at present. Aborted." );
-            return false;
-        case 1:
-            var file = Cc["@mozilla.org/file/local;1"].createInstance( Ci.nsILocalFile );
-            file.initWithPath( output_directory.value );
-            file.append( base_name.value + filename_timestamp() + suffix );
-            log_window.log( "Computed file name = " + file.path );
-            outputs.push( { storage: new Storage.Local_File( file ), encode: encoding } );
-            break;
-        case 2:
-            /*
-             * This is in at present to ensure that the JSON encoder does not unexpectedly throw. We can take it out
-             * when we're assured that it doesn't.
-             */
-            outputs.push( { storage: new Storage.Bit_Bucket(), encode: "JSON" } );
-            break;
-        default:
-            log_window.log( "WTF? Unknown storage tab. Aborted. si=" + si );
-            return false;
-    }
-
     let mainWindow = window.opener;
     if ( !mainWindow || mainWindow.closed )
     {
@@ -306,14 +280,39 @@ function start_crawl()
     document.getElementById( "progress_label" ).value = "Active/Completed/Total";
 
     current_session = new Application_Session(
-        instructions, outputs, log_window, mainWindow,
+        instructions, log_window, mainWindow,
         leave_open(), number_of_tabs.value,
         function( x )
         {
             progress_message.value = x.active + "/" + x.completed + "/" + x.total;
         }
     );
+
+    /*
+     * Output
+     */
     current_session.add_output( log_to_textbox, "YAML" );
+    si = document.getElementById( "storage_tabbox" ).selectedIndex;
+    switch ( si )
+    {
+        case 0:
+            log_window.log( "Server storage not supported at present. Aborted." );
+            return false;
+        case 1:
+            var file = Cc["@mozilla.org/file/local;1"].createInstance( Ci.nsILocalFile );
+            file.initWithPath( output_directory.value );
+            file.append( base_name.value + filename_timestamp() + suffix );
+            log_window.log( "Computed file name = " + file.path );
+            current_session.add_output( new Storage.Local_File( file ), encoding );
+            break;
+        case 2:
+            // Tab: No output.
+            break;
+        default:
+            log_window.log( "WTF? Unknown storage tab. Aborted. si=" + si );
+            return false;
+    }
+
 
     current_session.run( crawl_finally, crawl_catch );
     current_session = null;
