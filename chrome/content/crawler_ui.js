@@ -280,7 +280,7 @@ function start_crawl()
     document.getElementById( "progress_label" ).value = "Active/Completed/Total";
 
     current_session = new Application_Session(
-        instructions, log_window, mainWindow,
+        instructions, mainWindow,
         leave_open(), number_of_tabs.value,
         function( x )
         {
@@ -329,7 +329,7 @@ function start_crawl()
 
 function crawl_catch( ex )
 {
-    crawler_ui_log( "crawl exception=" + ex.toString() );
+    Cu.reportError( "crawler_ui: Caught crawl exception=" + ex.toString() );
 }
 
 function crawl_finally()
@@ -359,10 +359,3 @@ Crawl_Display.prototype.write = function( message )
 };
 
 crawler_ui_log = (new Logger( "crawler_ui" )).make_log();
-
-function filename_timestamp()
-{
-    var s = Logger.timestamp();
-    return "_" + s.substr( 0, 10 ) + "_" + s.substr( 11, 2 ) + "-" + s.substr( 14, 2 ) + "-" + s.substr( 17, 2 );
-}
-
