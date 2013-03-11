@@ -1,7 +1,3 @@
 content   abpcrawler chrome/content/
 skin      abpcrawler classic/1.0 chrome/skin/
 locale    abpcrawler {{LOCALE}} chrome/locale/{{LOCALE}}/
-### Command line handler
-component {771575E6-62FE-48CB-BC24-EAEFDDC1CA1D} lib/command_line.js
-contract  @adblockplus.org/abpcrawler/command-line;1 {771575E6-62FE-48CB-BC24-EAEFDDC1CA1D}
-category profile-after-change Command_Line @adblockplus.org/abpcrawler/command-line;1
