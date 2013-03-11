@@ -50,6 +50,8 @@ var log_window, progress_message;
 
 function loader()
 {
+    crawler_ui_log( "Loading." );
+
     log_window = new Crawl_Display();
     progress_message = document.getElementById( "progress" );
     go_button = document.getElementById( "crawl_go" );
