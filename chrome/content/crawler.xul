@@ -56,7 +56,7 @@
                                                    tooltiptext="Change the input file"/>
                                             <textbox id="input_file"
                                                      placeholder="&lt;no input file&gt;"
-                                                     size="60"/>
+                                                     size="40"/>
                                         </hbox>
                                     </vbox>
                                 </tabpanel>
@@ -73,7 +73,7 @@
                                 <label>Simultaneous Loads</label>
                                 <textbox
                                         id="number_of_tabs" type="number" min="1" value="5"
-                                        width="32"
+                                        width="60"
                                         persist="value"/>
                             </hbox>
                             <checkbox id="leave_open"
@@ -116,7 +116,7 @@
                                                    tooltiptext="Change the output directory"/>
                                             <textbox id="output_directory"
                                                      placeholder="&lt;current directory&gt;"
-                                                     size="60"/>
+                                                     size="40"/>
                                         </hbox>
                                     </vbox>
                                 </tabpanel>
@@ -145,7 +145,7 @@
                         <label id="progress"/>
                     </hbox>
                     <textbox id="log_box"
-                             multiline="true" cols="132" rows="40" wrap="off"
+                             multiline="true" cols="120" rows="40" wrap="off"
                              readonly="true"
                              placeholder="Activity Log"/>
                 </vbox>
