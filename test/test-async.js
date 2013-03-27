@@ -5,7 +5,7 @@ AsyncTest = AsyncTestCase( "AsyncTest" );
  */
 AsyncTest.prototype.test__source_is_well_formed = function()
 {
-  assertTrue( Async != null );
+  assertTrue( Action != null );
   assertTrue( Action.dispatch != null );
 };
 
@@ -198,11 +198,11 @@ function simple_catch( factory, queue )
 /**
  * Factory for Defer objects
  * @param trial
- * @return {Async.Defer}
+ * @return {Action.Defer}
  */
 function defer_factory( trial )
 {
-  return new Async.Defer( trial );
+  return new Action.Defer( trial );
 }
 
 AsyncTest.prototype.test_defer_try = function( queue )
@@ -228,11 +228,11 @@ AsyncTest.prototype.test_defer_catch = function( queue )
  * Factory for Delay objects
  * @param delay
  * @param trial
- * @return {Async.Delay}
+ * @return {Action.Delay}
  */
 function delay_factory( delay, trial )
 {
-  return new Async.Delay( trial, delay );
+  return new Action.Delay( trial, delay );
 }
 
 function simple_delay_factory( trial )
