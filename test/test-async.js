@@ -1,9 +1,9 @@
-AsyncTest = AsyncTestCase( "AsyncTest" );
+ActionTest = AsyncTestCase( "ActionTest" );
 
 /**
  * Test that variables are defined
  */
-AsyncTest.prototype.test__source_is_well_formed = function()
+ActionTest.prototype.test__source_is_well_formed = function()
 {
   assertTrue( Action != null );
   assertTrue( Action.dispatch != null );
@@ -205,17 +205,17 @@ function defer_factory( trial )
   return new Action.Defer( trial );
 }
 
-AsyncTest.prototype.test_defer_try = function( queue )
+ActionTest.prototype.test_defer_try = function( queue )
 {
   simple_try( defer_factory, queue );
 };
 
-AsyncTest.prototype.test_defer_finally = function( queue )
+ActionTest.prototype.test_defer_finally = function( queue )
 {
   simple_finally( defer_factory, queue );
 };
 
-AsyncTest.prototype.test_defer_catch = function( queue )
+ActionTest.prototype.test_defer_catch = function( queue )
 {
   simple_catch( defer_factory, queue );
 };
@@ -240,17 +240,17 @@ function simple_delay_factory( trial )
   return delay_factory( 2, trial );
 }
 
-AsyncTest.prototype.test_delay_tries = function( queue )
+ActionTest.prototype.test_delay_tries = function( queue )
 {
   simple_try( simple_delay_factory, queue );
 };
 
-AsyncTest.prototype.test_delay_finally = function( queue )
+ActionTest.prototype.test_delay_finally = function( queue )
 {
   simple_finally( simple_delay_factory, queue );
 };
 
-AsyncTest.prototype.test_delay_catch = function( queue )
+ActionTest.prototype.test_delay_catch = function( queue )
 {
   simple_catch( simple_delay_factory, queue );
 };
