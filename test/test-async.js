@@ -27,40 +27,53 @@ Async.Asynchronous_Action.prototype.get_state = function()
 //-------------------------------------------------------
 // Generic tests
 //-------------------------------------------------------
-function verify_phase()
+/**
+ *
+ * @param {Async.Asynchronous_Action} action
+ * @param {string} state_name
+ */
+function verify_state( action, state_name )
 {
+  var expected = Async.Action.State[ state_name ];
+  assertEquals( "action state is not '" + state_name + "'.", expected, action.get_state() );
 }
 
 /**
  * Check that an action executes its body and returns. Generic for simple, non-compound actions.
  *
- * @param {function(function):Async.Asynchronous_Action_interface} factory
+ * @param {function(function):Async.Asynchronous_Action} factory
  *    A factory function that yields an action.
  * @param queue
  */
 function simple_try( factory, queue )
 {
+  /**
+   * @type {Async.Asynchronous_Action}
+   */
   var d = null;
   var sequence = 0;
 
+  function trial()
+  {
+    verify_state( d, "Running" );
+    sequence += 1;
+  }
+
   queue.call( "Go phase.", function( callbacks )
   {
-    var trial = callbacks.add( function()
-    {
-      assertEquals( Async.Action.State.Running, d.get_state() );
-      sequence += 1;
-    } );
-    d = factory( trial );
-    assertEquals( Async.Action.State.Ready, d.get_state() );
+    var monitored_trial = callbacks.add( trial );
+    d = factory( monitored_trial );
+    verify_state( d, "Ready" );
     assertEquals( 0, sequence );
     d.go();
+    verify_state( d, "Running" );
     assertEquals( 0, sequence );
   } );
 
   queue.call( "End phase.", function()
   {
+    verify_state( d, "Done" );
     assertEquals( 1, sequence );
-    assertEquals( "action state is not 'Done'.", Async.Action.State.Done, d.get_state() );
   } );
 }
 
@@ -80,6 +93,12 @@ function simple_finally( factory, queue )
   var d;
   var sequence = 0;
 
+  function trial()
+  {
+    verify_state( d, "Running" );
+    sequence += 1;
+  }
+
   function catcher()
   {
     fail( "Action under test should not throw an exception nor call its catcher." );
@@ -87,25 +106,26 @@ function simple_finally( factory, queue )
 
   function finisher()
   {
+    verify_state( d, "Done" );
     sequence += 2;
   }
 
   queue.call( "Go phase.", function( callbacks )
   {
-    var trial = callbacks.add( function()
-    {
-      sequence += 1;
-    } );
-    d = factory( trial );
-    assertEquals( 0, sequence );
+    var monitored_trial = callbacks.add( trial );
+    d = factory( monitored_trial );
     var monitored_finisher = callbacks.add( finisher );
+    verify_state( d, "Ready" );
+    assertEquals( 0, sequence );
     d.go( monitored_finisher, catcher );
+    verify_state( d, "Running" );
+    assertEquals( 0, sequence );
   } );
 
   queue.call( "End phase.", function()
   {
+    verify_state( d, "Done" );
     assertEquals( 3, sequence );
-    assertEquals( "action state is not 'Done'.", Async.Action.State.Done, d.get_state() );
   } );
 }
 
@@ -129,6 +149,7 @@ function simple_catch( factory, queue )
 
   function trial()
   {
+    verify_state( d, "Running" );
     assertEquals( 0, sequence );
     sequence += 1;
     throw new Error( "This error is part of the test." );
@@ -136,12 +157,14 @@ function simple_catch( factory, queue )
 
   function catcher()
   {
+    verify_state( d, "Exception" );
     assertEquals( 1, sequence );
     sequence += 2;
   }
 
   function finisher()
   {
+    verify_state( d, "Exception" );
     assertEquals( 3, sequence );
     sequence += 4;
   }
@@ -154,15 +177,17 @@ function simple_catch( factory, queue )
     d = factory( trial );
     var monitored_catch = callbacks.add( catcher );
     var monitored_finally = callbacks.add( finisher );
+    verify_state( d, "Ready" );
     assertEquals( 0, sequence );
     d.go( monitored_finally, monitored_catch );
+    verify_state( d, "Running" );
     assertEquals( 0, sequence );
   } );
 
   queue.call( "End phase.", function()
   {
+    verify_state( d, "Exception" );
     assertEquals( 7, sequence );
-    assertEquals( "action state is not 'Exception'.", Async.Action.State.Exception, d.get_state() );
   } );
 }
 
