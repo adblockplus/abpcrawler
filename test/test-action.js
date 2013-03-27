@@ -130,7 +130,7 @@ function simple_finally( factory, queue )
 }
 
 /**
- * Run a simple trial, one that throws an exception, with both finally and catch functions. Indirectly verify that all
+ * Run a simple trial, one that throws an exception, with both finisher and catcher. Indirectly verify that all
  * three run, but directly verify only the finally and catch.
  *
  * Generic for simple non-compound actions.
