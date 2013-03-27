@@ -6,7 +6,7 @@ AsyncTest = AsyncTestCase( "AsyncTest" );
 AsyncTest.prototype.test__source_is_well_formed = function()
 {
   assertTrue( Async != null );
-  assertTrue( Async.dispatch != null );
+  assertTrue( Action.dispatch != null );
 };
 
 //-------------------------------------------------------
@@ -16,9 +16,9 @@ AsyncTest.prototype.test__source_is_well_formed = function()
  * Retrieve the internal state property. Defined as a utility function with the tests because it's not an ordinary
  * interface.
  *
- * @return {Async.Action.State}
+ * @return {Action.State}
  */
-Async.Asynchronous_Action.prototype.get_state = function()
+Action.Asynchronous_Action.prototype.get_state = function()
 {
   // Member '_state' marked as private. No warning if accessed in a prototype method.
   return this._state;
@@ -29,26 +29,26 @@ Async.Asynchronous_Action.prototype.get_state = function()
 //-------------------------------------------------------
 /**
  *
- * @param {Async.Asynchronous_Action} action
+ * @param {Action.Asynchronous_Action} action
  * @param {string} state_name
  */
 function verify_state( action, state_name )
 {
-  var expected = Async.Action.State[ state_name ];
+  var expected = Action.State[ state_name ];
   assertEquals( "action state is not '" + state_name + "'.", expected, action.get_state() );
 }
 
 /**
  * Check that an action executes its body and returns. Generic for simple, non-compound actions.
  *
- * @param {function(function):Async.Asynchronous_Action} factory
+ * @param {function(function):Action.Asynchronous_Action} factory
  *    A factory function that yields an action.
  * @param queue
  */
 function simple_try( factory, queue )
 {
   /**
-   * @type {Async.Asynchronous_Action}
+   * @type {Action.Asynchronous_Action}
    */
   var d = null;
   var sequence = 0;
@@ -88,7 +88,7 @@ function simple_try( factory, queue )
 function simple_finally( factory, queue )
 {
   /**
-   * @type {Async.Asynchronous_Action}
+   * @type {Action.Asynchronous_Action}
    */
   var d;
   var sequence = 0;
@@ -142,7 +142,7 @@ function simple_finally( factory, queue )
 function simple_catch( factory, queue )
 {
   /**
-   * @type {Async.Asynchronous_Action}
+   * @type {Action.Asynchronous_Action}
    */
   var d;
   var sequence = 0;
