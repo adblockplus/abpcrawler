@@ -248,15 +248,40 @@ ActionTest.prototype.test_delay_catch = function( queue )
 //-------------------------------------------------------
 // Join
 //-------------------------------------------------------
-ActionTest.prototype.test_join_1 = function( queue )
+ActionTest.prototype.test_join__throw_on_null_constructor_argument = function( queue )
+{
+  try
+  {
+    var join = new Action.Join( null );
+    fail( "Join must throw an exception when passed a null constructor argument." );
+  }
+  catch ( e )
+  {
+    // Exception is what's supposed to happen.
+  }
+};
+
+function join_test( variation, queue )
+/**
+ * Combined variations on a number of simple join tests. There's an ordinary action and a join that it depends upon.
+ * Both are invoked. The ordinary action executes first and then the join does.
+ *
+ * There are four operations {construct, go} x {ordinary, join} and some ordering dependencies. The construction of the
+ * join must come after that of the ordinary action. Each invocation must come after construction. Given these
+ * constraints, there are three possible orders.
+ *
+ * @param variation
+ * @param queue
+ */
 {
   var sequence = 0;
   var defer = null, join = null;
 
   function deferred_trial()
   {
-    verify_state( defer, "Running" );
     // The Defer instance should run first
+    verify_state( defer, "Running" );
+    verify_state( join, "Running" );
     assertEquals( "deferred trial. sequence", 0, sequence );
     sequence += 1;
   }
@@ -268,18 +293,62 @@ ActionTest.prototype.test_join_1 = function( queue )
 
   function joined_finisher()
   {
+    // The Join instance should run second.
+    verify_state( defer, "Done" );
     verify_state( join, "Done" );
     assertEquals( "joined finisher. sequence", 1, sequence );
     sequence += 2;
   }
 
+  function make_join()
+  {
+    join = new Action.Join( defer );
+    verify_state( join, "Ready" );
+  }
+
+  function join_go( callbacks )
+  {
+    join.go( callbacks.add( joined_finisher, null, 1000, "joined finisher" ), joined_catcher );
+  }
+
   queue.call( "Phase[1]=Go.", function( callbacks )
   {
+    /*
+     * Construction of the Defer instance always has to come first.
+     */
     defer = new Action.Defer( callbacks.add( deferred_trial ) );
-    join = new Action.Join( defer );
-    // In this test, invoke the join first to test joining on a not-yet-completed action.
-    join.go( callbacks.add( joined_finisher, null, 1000, "joined finisher" ), joined_catcher );
-    defer.go();
+    verify_state( defer, "Ready" );
+    switch ( variation )
+    {
+      case "existing ready":
+        /*
+         * Invoke the join before the defer has been invoked. This tests joining to a ready action.
+         */
+        make_join();
+        join_go( callbacks );
+        defer.go();
+        break;
+      case "existing running":
+        /*
+         * Invoke the join after the defer has been invoked. This tests joining to a running action.
+         */
+        make_join();
+        defer.go();
+        join_go( callbacks );
+        break;
+      case "new running":
+        /*
+         * Construct the join after defer has already been invoked.
+         */
+        defer.go();
+        make_join();
+        join_go( callbacks );
+        break;
+      default:
+        throw new Error( "unknown variation" );
+    }
+    verify_state( defer, "Running" );
+    verify_state( join, "Running" );
   } );
 
   queue.call( "Phase[2]=End.", function( callbacks )
@@ -288,4 +357,19 @@ ActionTest.prototype.test_join_1 = function( queue )
     verify_state( join, "Done" );
     assertEquals( 3, sequence );
   } );
+}
+
+ActionTest.prototype.test_join__existing_join_to_new_defer_instance_OLD = function( queue )
+{
+  join_test( "existing ready", queue );
+};
+
+ActionTest.prototype.test_join__existing_join_to_running_defer_instance = function( queue )
+{
+  join_test( "existing running", queue );
+};
+
+ActionTest.prototype.test_join__new_join_to_running_defer_instance = function( queue )
+{
+  join_test( "new running", queue )
 };
