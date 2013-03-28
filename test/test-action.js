@@ -12,17 +12,6 @@ ActionTest.prototype.test__source_is_well_formed = function()
 //-------------------------------------------------------
 // Utility
 //-------------------------------------------------------
-/**
- * Retrieve the internal state property. Defined as a utility function with the tests because it's not an ordinary
- * interface.
- *
- * @return {Action.State}
- */
-Action.Asynchronous_Action.prototype.get_state = function()
-{
-  // Member '_state' marked as private. No warning if accessed in a prototype method.
-  return this._state;
-};
 
 //-------------------------------------------------------
 // Generic tests
@@ -35,7 +24,7 @@ Action.Asynchronous_Action.prototype.get_state = function()
 function verify_state( action, state_name )
 {
   var expected = Action.State[ state_name ];
-  assertEquals( "action state is not '" + state_name + "'.", expected, action.get_state() );
+  assertEquals( "action state is not '" + state_name + "'.", expected, action.state );
 }
 
 /**
@@ -255,3 +244,48 @@ ActionTest.prototype.test_delay_catch = function( queue )
   simple_catch( simple_delay_factory, queue );
 };
 
+
+//-------------------------------------------------------
+// Join
+//-------------------------------------------------------
+ActionTest.prototype.test_join_1 = function( queue )
+{
+  var sequence = 0;
+  var defer = null, join = null;
+
+  function deferred_trial()
+  {
+    verify_state( defer, "Running" );
+    // The Defer instance should run first
+    assertEquals( "deferred trial. sequence", 0, sequence );
+    sequence += 1;
+  }
+
+  function joined_catcher()
+  {
+    fail( "Joined catcher should not be called." );
+  }
+
+  function joined_finisher()
+  {
+    verify_state( join, "Done" );
+    assertEquals( "joined finisher. sequence", 1, sequence );
+    sequence += 2;
+  }
+
+  queue.call( "Phase[1]=Go.", function( callbacks )
+  {
+    defer = new Action.Defer( callbacks.add( deferred_trial ) );
+    join = new Action.Join( defer );
+    // In this test, invoke the join first to test joining on a not-yet-completed action.
+    join.go( callbacks.add( joined_finisher, null, 1000, "joined finisher" ), joined_catcher );
+    defer.go();
+  } );
+
+  queue.call( "Phase[2]=End.", function( callbacks )
+  {
+    verify_state( defer, "Done" );
+    verify_state( join, "Done" );
+    assertEquals( 3, sequence );
+  } );
+};
