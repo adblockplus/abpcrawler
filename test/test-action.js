@@ -308,7 +308,7 @@ function join_test( variation, queue )
 
   function join_go( callbacks )
   {
-    join.go( callbacks.add( joined_finisher, null, 1000, "joined finisher" ), joined_catcher );
+    join.go( callbacks.add( joined_finisher, null, 2000, "joined finisher" ), joined_catcher );
   }
 
   queue.call( "Phase[1]=Go.", function( callbacks )
@@ -359,7 +359,7 @@ function join_test( variation, queue )
   } );
 }
 
-ActionTest.prototype.test_join__existing_join_to_new_defer_instance_OLD = function( queue )
+ActionTest.prototype.test_join__existing_join_to_new_defer_instance = function( queue )
 {
   join_test( "existing ready", queue );
 };
