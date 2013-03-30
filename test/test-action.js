@@ -261,7 +261,7 @@ ActionTest.prototype.test_join__throw_on_null_constructor_argument = function( q
   }
 };
 
-function join_test( variation, queue )
+function join_test( variation, factory, queue )
 /**
  * Combined variations on a number of simple join tests. There's an ordinary action and a join that it depends upon.
  * Both are invoked. The ordinary action executes first and then the join does.
@@ -301,7 +301,7 @@ function join_test( variation, queue )
 
   function make_join()
   {
-    join = new Action.Join( defer );
+    join = factory( defer );
     verify_state( join, "Ready" );
   }
 
@@ -401,22 +401,27 @@ function join_test( variation, queue )
   } );
 }
 
+function join_factory( action )
+{
+  return new Action.Join( action );
+}
+
 ActionTest.prototype.test_join__existing_join_to_new_defer_instance = function( queue )
 {
-  join_test( "existing ready", queue );
+  join_test( "existing ready", join_factory, queue );
 };
 
 ActionTest.prototype.test_join__existing_join_to_running_defer_instance = function( queue )
 {
-  join_test( "existing running", queue );
+  join_test( "existing running", join_factory, queue );
 };
 
 ActionTest.prototype.test_join__existing_join_to_running_defer_instance__split = function( queue )
 {
-  join_test( "existing running split", queue );
+  join_test( "existing running split", join_factory, queue );
 };
 
 ActionTest.prototype.test_join__new_join_to_running_defer_instance = function( queue )
 {
-  join_test( "new running", queue )
+  join_test( "new running", join_factory, queue )
 };
