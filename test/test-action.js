@@ -271,6 +271,7 @@ function join_test( variation, factory, queue )
  * constraints, there are three possible orders.
  *
  * @param variation
+ * @param factory
  * @param queue
  */
 {
@@ -425,3 +426,33 @@ ActionTest.prototype.test_join__new_join_to_running_defer_instance = function( q
 {
   join_test( "new running", join_factory, queue )
 };
+
+/*
+ * Join_Timeout factory set at 15 seconds, which should be enough longer than callback limit, set to 2 seconds, to
+ * avoid false negatives.
+ */
+function join_timeout_factory( action )
+{
+  return new Action.Join_Timeout( action, 15000 );
+}
+
+ActionTest.prototype.test_join_timeout__existing_join_to_new_defer_instance = function( queue )
+{
+  join_test( "existing ready", join_timeout_factory, queue );
+};
+
+ActionTest.prototype.test_join_timeout__existing_join_to_running_defer_instance = function( queue )
+{
+  join_test( "existing running", join_timeout_factory, queue );
+};
+
+ActionTest.prototype.test_join_timeout__existing_join_to_running_defer_instance__split = function( queue )
+{
+  join_test( "existing running split", join_timeout_factory, queue );
+};
+
+ActionTest.prototype.test_join_timeout__new_join_to_running_defer_instance = function( queue )
+{
+  join_test( "new running", join_timeout_factory, queue )
+};
+
