@@ -456,3 +456,46 @@ ActionTest.prototype.test_join_timeout__new_join_to_running_defer_instance = fun
   join_test( "new running", join_timeout_factory, queue )
 };
 
+
+ActionTest.prototype.test_join_timeout__simple_timeout = function( queue )
+{
+  var sequence = 0;
+
+  function defer_trial()
+  {
+    fail( "The trial on the defer object should not be called." );
+  }
+
+  function join_catch()
+  {
+    assertEquals( 0, sequence );
+    sequence += 1;
+    verify_state( defer, "Ready" );
+    verify_state( join, "Exception" );
+    assertTrue( "Join should be exceptional.", !join.completed_well );
+  }
+
+  function join_finally()
+  {
+  }
+
+  /*
+   * Construct the defer object outside the test queue because it does not generate a callback in this case.
+   */
+  var defer = new Action.Defer( defer_trial );
+  verify_state( defer, "Ready" );
+  var join;
+  queue.call( "Phase[1]=Go.", function( callbacks )
+  {
+    /*
+     * Timeout is set to a very short time.
+     */
+    join = new Action.Join_Timeout( defer, 1 );
+    var monitored_join_catch = callbacks.add( join_catch, null, 1000, "join catch" );
+    join.go( join_finally, monitored_join_catch );
+  } );
+  /*
+   * No need to launch the Defer action. If the timeout doesn't trigger the catcher, the test fails.
+   */
+};
+
