@@ -281,7 +281,6 @@ function join_test( variation, queue )
   {
     // The Defer instance should run first
     verify_state( defer, "Running" );
-    verify_state( join, "Running" );
     assertEquals( "deferred trial. sequence", 0, sequence );
     sequence += 1;
   }
@@ -316,7 +315,7 @@ function join_test( variation, queue )
     /*
      * Construction of the Defer instance always has to come first.
      */
-    defer = new Action.Defer( callbacks.add( deferred_trial ) );
+    defer = new Action.Defer( callbacks.add( deferred_trial, null, 2000, "defer_trial" ) );
     verify_state( defer, "Ready" );
     switch ( variation )
     {
@@ -327,6 +326,8 @@ function join_test( variation, queue )
         make_join();
         join_go( callbacks );
         defer.go();
+        verify_state( defer, "Running" );
+        verify_state( join, "Running" );
         break;
       case "existing running":
         /*
@@ -335,6 +336,22 @@ function join_test( variation, queue )
         make_join();
         defer.go();
         join_go( callbacks );
+        /*
+         * The defer is running, but it hasn't completed yet, so the join hasn't completed yet. Contrast this with
+         * the split version, where the defer action has already completed when we invoke the join.
+         */
+        verify_state( defer, "Running" );
+        verify_state( join, "Running" );
+        break;
+      case "existing running split":
+        /*
+         * Invoke the defer after the join is invoked, but invoke the join later. This test ensures that the join
+         * does not complete prematurely.
+         */
+        make_join();
+        defer.go();
+        verify_state( defer, "Running" );
+        verify_state( join, "Ready" );
         break;
       case "new running":
         /*
@@ -343,15 +360,40 @@ function join_test( variation, queue )
         defer.go();
         make_join();
         join_go( callbacks );
+        verify_state( defer, "Running" );
+        verify_state( join, "Running" );
         break;
       default:
         throw new Error( "unknown variation" );
     }
-    verify_state( defer, "Running" );
-    verify_state( join, "Running" );
   } );
 
-  queue.call( "Phase[2]=End.", function( callbacks )
+  queue.call( "Phase[2]=Intermediate.", function( callbacks )
+  {
+    switch ( variation )
+    {
+      case "existing running split":
+        /*
+         * The join should not yet have run at this point.
+         */
+        verify_state( defer, "Done" );
+        verify_state( join, "Ready" );
+        /*
+         * We invoke the join on a completed action. As a result, the join will complete immediately.
+         */
+        join_go( callbacks );
+        verify_state( defer, "Done" );
+        verify_state( join, "Done" );
+        break;
+      default:
+        /*
+         * We're already verified the variation in the first phase. Some variations have no intermediate phase.
+         */
+        break;
+    }
+  } );
+
+  queue.call( "Phase[3]=End.", function( callbacks )
   {
     verify_state( defer, "Done" );
     verify_state( join, "Done" );
@@ -367,6 +409,11 @@ ActionTest.prototype.test_join__existing_join_to_new_defer_instance = function( 
 ActionTest.prototype.test_join__existing_join_to_running_defer_instance = function( queue )
 {
   join_test( "existing running", queue );
+};
+
+ActionTest.prototype.test_join__existing_join_to_running_defer_instance__split = function( queue )
+{
+  join_test( "existing running split", queue );
 };
 
 ActionTest.prototype.test_join__new_join_to_running_defer_instance = function( queue )
