@@ -1,5 +1,6 @@
 /**
- * @fileOverview A platform-specific primitive set for the module async.js.
+ * @fileOverview A platform-specific primitive set for the module action.js. This is targeted at the js-test-driver,
+ * which uses the browser.
  */
 
 /**
@@ -21,3 +22,21 @@ Action_Platform.clear_timer = function( id )
 {
   clearTimeout( id );
 };
+
+/**
+ * The file "action.js" is targeted for the ABP bootstrapped extension environment. We need an implementation of
+ * require() to make it work.
+ *
+ * @param module_name
+ * @return {{Action_Platform: *}}
+ */
+function require( module_name )
+{
+  switch ( module_name )
+  {
+    case "action_platform":
+      return { Action_Platform: Action_Platform };
+    default:
+      throw new Error( "Module name not recognized." );
+  }
+}
