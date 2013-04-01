@@ -44,12 +44,12 @@ function exercise_actions()
   write( "# 1\n" );
   var defer = new Action.Defer( function()
   {
-    write( "Defer executed.")
+    write( "Defer executed." )
   } );
 
   function catcher()
   {
-    write( "Successfully caught.\n" );
+    write( "Join_Timeout catcher: timed_out = " + join.timed_out + ".\n" );
   }
 
   function finisher()
