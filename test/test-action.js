@@ -246,6 +246,77 @@ ActionTest.prototype.test_delay_catch = function( queue )
 
 
 //-------------------------------------------------------
+// JM_Reporting implementation in Asynchronous_Action
+//-------------------------------------------------------
+var Asynchronous_Action__Test = AsyncTestCase( "Asynchronous_Action__Test" );
+
+
+/*
+ * Test plan: Make a simple action and join to it twice. Ensure that all mutual references are null everything
+ * completes.
+ */
+Asynchronous_Action__Test.prototype.test_reporting__simple = function( queue )
+{
+  var defer, join1, join2;
+
+  function null_function()
+  {
+  }
+
+  function reporting_has_watchers( action, n )
+  {
+    assertTrue( "_end_watchers" in action );
+    assertEquals( n, action._end_watchers.length );
+  }
+
+  function reporting_is_empty( action )
+  {
+    if ( "_end_watchers" in action )
+    {
+      if ( action._end_watchers.length == 0 )
+        return;
+      fail( "_end_watchers is still present and not empty." );
+    }
+    // If the _end_watchers array is absent, then the outbound reporting links are absent and the test passes.
+  }
+
+  function attentive_is_empty( action )
+  {
+    assertNull( "joined_action should be null.", action.joined_action );
+  }
+
+  queue.call( "Phase[1]=Go.", function( callbacks )
+  {
+    // argument[2] is the number of times to expect this function
+    var monitored_trial_function = callbacks.add( null_function, 1, 5000, "defer trial function" );
+    var monitored_finisher_function = callbacks.add( null_function, 2, 5000, "join finisher function" );
+    defer = new Action.Defer( monitored_trial_function );
+    reporting_has_watchers( defer, 0 );
+    join1 = new Action.Join( defer );
+    join2 = new Action.Join( defer );
+    reporting_has_watchers( defer, 0 );
+    join1.go( monitored_finisher_function );
+    reporting_has_watchers( defer, 1 );
+    join2.go( monitored_finisher_function );
+    reporting_has_watchers( defer, 2 );
+    defer.go();
+    verify_state( defer, "Running" );
+    verify_state( join1, "Running" );
+  } );
+
+  queue.call( "Phase[2]=Complete.", function( callbacks )
+  {
+    verify_state( defer, "Done" );
+    verify_state( join1, "Done" );
+    reporting_is_empty( defer );
+    reporting_is_empty( join1 );
+    reporting_is_empty( join2 );
+    attentive_is_empty( join1 );
+    attentive_is_empty( join2 );
+  } );
+};
+
+//-------------------------------------------------------
 // Join
 //-------------------------------------------------------
 ActionTest.prototype.test_join__throw_on_null_constructor_argument = function( queue )
@@ -426,7 +497,6 @@ ActionTest.prototype.test_join__new_join_to_running_defer_instance = function( q
 {
   join_test( "new running", join_factory, queue )
 };
-
 
 
 ActionTest.Join_Timeout = AsyncTestCase( "Join_Timeout" );
