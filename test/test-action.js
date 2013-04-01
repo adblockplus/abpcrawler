@@ -250,12 +250,27 @@ ActionTest.prototype.test_delay_catch = function( queue )
 //-------------------------------------------------------
 var Asynchronous_Action__Test = AsyncTestCase( "Asynchronous_Action__Test" );
 
+function assert_reporting_is_empty( action )
+{
+  if ( "_end_watchers" in action )
+  {
+    // If the array exists, everything in it must be null.
+    var i;
+    for ( i = 0 ; i < action._end_watchers.length ; ++i )
+    {
+      if ( action._end_watchers[ i ] )
+        fail( "_end_watchers is still present and not empty." );
+    }
+  }
+  // If the _end_watchers array is absent, then the outbound reporting links are absent and the test passes.
+}
+
 
 /*
  * Test plan: Make a simple action and join to it twice. Ensure that all mutual references are null everything
  * completes.
  */
-Asynchronous_Action__Test.prototype.test_reporting__simple = function( queue )
+Asynchronous_Action__Test.prototype.test_reporting__refencerences_are_absent_upon_completion = function( queue )
 {
   var defer, join1, join2;
 
@@ -267,17 +282,6 @@ Asynchronous_Action__Test.prototype.test_reporting__simple = function( queue )
   {
     assertTrue( "_end_watchers" in action );
     assertEquals( n, action._end_watchers.length );
-  }
-
-  function reporting_is_empty( action )
-  {
-    if ( "_end_watchers" in action )
-    {
-      if ( action._end_watchers.length == 0 )
-        return;
-      fail( "_end_watchers is still present and not empty." );
-    }
-    // If the _end_watchers array is absent, then the outbound reporting links are absent and the test passes.
   }
 
   function attentive_is_empty( action )
@@ -308,11 +312,52 @@ Asynchronous_Action__Test.prototype.test_reporting__simple = function( queue )
   {
     verify_state( defer, "Done" );
     verify_state( join1, "Done" );
-    reporting_is_empty( defer );
-    reporting_is_empty( join1 );
-    reporting_is_empty( join2 );
+    verify_state( join2, "Done" );
+    assert_reporting_is_empty( defer );
+    assert_reporting_is_empty( join1 );
+    assert_reporting_is_empty( join2 );
     attentive_is_empty( join1 );
     attentive_is_empty( join2 );
+  } );
+};
+
+Asynchronous_Action__Test.prototype.test_reporting__refencerences_are_absent_after_cancel = function( queue )
+{
+  var defer, join;
+
+  function null_function()
+  {
+  }
+
+  function reporting_has_watchers( action, n )
+  {
+    assertTrue( "_end_watchers" in action );
+    assertEquals( n, action._end_watchers.length );
+  }
+
+  function attentive_is_empty( action )
+  {
+    assertNull( "joined_action should be null.", action.joined_action );
+  }
+
+  queue.call( "Phase[1]=Go.", function( callbacks )
+  {
+    // argument[2] is the number of times to expect this function
+    var monitored_finisher_function = callbacks.add( null_function, 1, 5000, "join finisher function" );
+    defer = new Action.Defer( null_function );
+    reporting_has_watchers( defer, 0 );
+    join = new Action.Join( defer );
+    reporting_has_watchers( defer, 0 );
+    join.go( monitored_finisher_function );
+    reporting_has_watchers( defer, 1 );
+    verify_state( defer, "Ready" );
+    verify_state( join, "Running" );
+    join.cancel();
+    verify_state( defer, "Ready" );
+    verify_state( join, "Done" );
+    assert_reporting_is_empty( defer );
+    assert_reporting_is_empty( join );
+    attentive_is_empty( join );
   } );
 };
 
