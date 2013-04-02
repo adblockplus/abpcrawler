@@ -180,6 +180,61 @@ function simple_catch( factory, queue )
   } );
 }
 
+/**
+ * Run a simple trial, one that throws an exception, with both finisher and catcher. Indirectly verify that all
+ * three run, but directly verify only the finally and catch.
+ *
+ * Generic for simple non-compound actions.
+ *
+ * @param {function} factory
+ *    A factory function that yields an action.
+ * @param queue
+ */
+function simple_abort( factory, queue )
+{
+  /**
+   * @type {Action.Asynchronous_Action}
+   */
+  var d;
+  var sequence = 0;
+
+  function trial()
+  {
+    fail( "Executed trial when aborted.");
+  }
+
+  function catcher()
+  {
+    verify_state( d, "Exception" );
+    assertEquals( 0, sequence );
+    sequence += 2;
+  }
+
+  function finisher()
+  {
+    verify_state( d, "Exception" );
+    assertEquals( 2, sequence );
+    sequence += 4;
+  }
+
+  queue.call( "Go phase.", function( callbacks )
+  {
+    /* If we monitor the trial by adding to the callback list, it will report the exception as an error, which is not
+     * what we want. We indirectly test that it runs by incrementing the sequence number.
+     */
+    d = factory( trial );
+    var monitored_catch = callbacks.add( catcher );
+    var monitored_finally = callbacks.add( finisher );
+    verify_state( d, "Ready" );
+    assertEquals( 0, sequence );
+    d.go( monitored_finally, monitored_catch );
+    verify_state( d, "Running" );
+    assertEquals( 0, sequence );
+    d.abort();
+    verify_state( d, "Exception" );
+    assertEquals( 6, sequence );
+  } );
+}
 
 //-------------------------------------------------------
 // Defer
@@ -207,6 +262,11 @@ ActionTest.prototype.test_defer_finally = function( queue )
 ActionTest.prototype.test_defer_catch = function( queue )
 {
   simple_catch( defer_factory, queue );
+};
+
+ActionTest.prototype.test_defer_abort = function( queue )
+{
+  simple_abort( defer_factory, queue );
 };
 
 //-------------------------------------------------------
@@ -243,7 +303,6 @@ ActionTest.prototype.test_delay_catch = function( queue )
 {
   simple_catch( simple_delay_factory, queue );
 };
-
 
 //-------------------------------------------------------
 // JM_Reporting implementation in Asynchronous_Action
