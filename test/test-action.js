@@ -200,7 +200,7 @@ function simple_abort( factory, queue )
 
   function trial()
   {
-    fail( "Executed trial when aborted.");
+    fail( "Executed trial when aborted." );
   }
 
   function catcher()
@@ -236,6 +236,42 @@ function simple_abort( factory, queue )
   } );
 }
 
+function simple_value( factory, queue )
+{
+  /**
+   * @type {Action.Asynchronous_Action}
+   */
+  var d;
+
+  function trial()
+  {
+    return [ 1, "two" ];
+  }
+
+  function finisher( a, b )
+  {
+    assertEquals( 1, a );
+    assertEquals( "two", b );
+  }
+
+  queue.call( "Phase[1] Go.", function( callbacks )
+  {
+    /* If we monitor the trial by adding to the callback list, it will report the exception as an error, which is not
+     * what we want. We indirectly test that it runs by incrementing the sequence number.
+     */
+    d = factory( trial );
+    var monitored_finally = callbacks.add( finisher );
+    verify_state( d, "Ready" );
+    d.go( monitored_finally );
+    verify_state( d, "Running" );
+  } );
+
+  queue.call( "Phase[2] Complete.", function( callbacks )
+  {
+    verify_state( d, "Done" );
+  } );
+}
+
 //-------------------------------------------------------
 // Defer
 //-------------------------------------------------------
@@ -267,6 +303,11 @@ ActionTest.prototype.test_defer_catch = function( queue )
 ActionTest.prototype.test_defer_abort = function( queue )
 {
   simple_abort( defer_factory, queue );
+};
+
+ActionTest.prototype.test_simple_value = function( queue )
+{
+  simple_value( defer_factory, queue );
 };
 
 //-------------------------------------------------------
