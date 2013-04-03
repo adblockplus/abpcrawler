@@ -750,7 +750,7 @@ ActionTest__Join_Timeout.prototype.test_join_timeout__simple_timeout = function(
     /*
      * Timeout is set to a very short time.
      */
-    var monitored_join_catch = callbacks.add( join_catch, null, 1000, "join catch" );
+    var monitored_join_catch = callbacks.add( join_catch, null, 5000, "join catch" );
     join = new Action.Join_Timeout( defer, 1, join_finally, monitored_join_catch );
     join.go();
   } );
