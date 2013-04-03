@@ -511,8 +511,10 @@ function join_test( variation, factory, queue )
     fail( "Joined catcher should not be called." );
   }
 
-  function join_finisher()
+  function join_finisher( x )
   {
+    assertEquals( "joined finisher. number of arguments", 1, arguments.length );
+    assertEquals( "joined finisher. first argument", "ABC", x );
     // The Join instance should run second.
     verify_state( defer, "Done" );
     verify_state( join, "Done" );
@@ -547,7 +549,7 @@ function join_test( variation, factory, queue )
 
   function join_go()
   {
-    join.go();
+    join.go( "ABC" );
   }
 
   queue.call( "Phase[1]=Go.", function( callbacks )
