@@ -30,7 +30,7 @@ function verify_state( action, state_name )
 /**
  * Check that an action executes its body and returns. Generic for simple, non-compound actions.
  *
- * @param {function(function):Action.Asynchronous_Action} factory
+ * @param {function} factory
  *    A factory function that yields an action.
  * @param queue
  */
@@ -266,7 +266,7 @@ function simple_value( factory, queue )
     verify_state( d, "Running" );
   } );
 
-  queue.call( "Phase[2] Complete.", function( callbacks )
+  queue.call( "Phase[2] Complete.", function()
   {
     verify_state( d, "Done" );
   } );
@@ -408,7 +408,7 @@ Asynchronous_Action__Test.prototype.test_reporting__refencerences_are_absent_upo
     verify_state( join1, "Running" );
   } );
 
-  queue.call( "Phase[2]=Complete.", function( callbacks )
+  queue.call( "Phase[2]=Complete.", function()
   {
     verify_state( defer, "Done" );
     verify_state( join1, "Done" );
@@ -464,11 +464,11 @@ Asynchronous_Action__Test.prototype.test_reporting__refencerences_are_absent_aft
 //-------------------------------------------------------
 // Join
 //-------------------------------------------------------
-ActionTest.prototype.test_join__throw_on_null_constructor_argument = function( queue )
+ActionTest.prototype.test_join__throw_on_null_constructor_argument = function()
 {
   try
   {
-    var join = new Action.Join( null );
+    new Action.Join( null );
     fail( "Join must throw an exception when passed a null constructor argument." );
   }
   catch ( e )
@@ -610,7 +610,7 @@ function join_test( variation, factory, queue )
     }
   } );
 
-  queue.call( "Phase[3]=End.", function( callbacks )
+  queue.call( "Phase[3]=End.", function()
   {
     verify_state( defer, "Done" );
     verify_state( join, "Done" );
@@ -620,7 +620,7 @@ function join_test( variation, factory, queue )
 
 function join_factory( action )
 {
-  return new Action.Join( action );
+  return new Action.Join( action, Array.prototype.slice.call(arguments, 1) );
 }
 
 ActionTest.prototype.test_join__existing_join_to_new_defer_instance = function( queue )
@@ -644,7 +644,7 @@ ActionTest.prototype.test_join__new_join_to_running_defer_instance = function( q
 };
 
 
-ActionTest.Join_Timeout = AsyncTestCase( "Join_Timeout" );
+ActionTest__Join_Timeout = AsyncTestCase( "Join_Timeout" );
 
 /*
  * Join_Timeout factory set at 15 seconds, which should be enough longer than callback limit, set to 2 seconds, to
@@ -655,28 +655,28 @@ function join_timeout_factory( action )
   return new Action.Join_Timeout( action, 15000 );
 }
 
-ActionTest.Join_Timeout.prototype.test_join_timeout__existing_join_to_new_defer_instance = function( queue )
+ActionTest__Join_Timeout.prototype.test_join_timeout__existing_join_to_new_defer_instance = function( queue )
 {
   join_test( "existing ready", join_timeout_factory, queue );
 };
 
-ActionTest.Join_Timeout.prototype.test_join_timeout__existing_join_to_running_defer_instance = function( queue )
+ActionTest__Join_Timeout.prototype.test_join_timeout__existing_join_to_running_defer_instance = function( queue )
 {
   join_test( "existing running", join_timeout_factory, queue );
 };
 
-ActionTest.Join_Timeout.prototype.test_join_timeout__existing_join_to_running_defer_instance__split = function( queue )
+ActionTest__Join_Timeout.prototype.test_join_timeout__existing_join_to_running_defer_instance__split = function( queue )
 {
   join_test( "existing running split", join_timeout_factory, queue );
 };
 
-ActionTest.Join_Timeout.prototype.test_join_timeout__new_join_to_running_defer_instance = function( queue )
+ActionTest__Join_Timeout.prototype.test_join_timeout__new_join_to_running_defer_instance = function( queue )
 {
   join_test( "new running", join_timeout_factory, queue )
 };
 
 
-ActionTest.Join_Timeout.prototype.test_join_timeout__simple_timeout = function( queue )
+ActionTest__Join_Timeout.prototype.test_join_timeout__simple_timeout = function( queue )
 {
   var sequence = 0;
 
