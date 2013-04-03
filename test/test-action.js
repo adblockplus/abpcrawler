@@ -102,11 +102,11 @@ function simple_finally( factory, queue )
   queue.call( "Go phase.", function( callbacks )
   {
     var monitored_trial = callbacks.add( trial );
-    d = factory( monitored_trial );
     var monitored_finisher = callbacks.add( finisher );
+    d = factory( monitored_trial, monitored_finisher, catcher );
     verify_state( d, "Ready" );
     assertEquals( 0, sequence );
-    d.go( monitored_finisher, catcher );
+    d.go();
     verify_state( d, "Running" );
     assertEquals( 0, sequence );
   } );
@@ -163,12 +163,12 @@ function simple_catch( factory, queue )
     /* If we monitor the trial by adding to the callback list, it will report the exception as an error, which is not
      * what we want. We indirectly test that it runs by incrementing the sequence number.
      */
-    d = factory( trial );
     var monitored_catch = callbacks.add( catcher );
     var monitored_finally = callbacks.add( finisher );
+    d = factory( trial, monitored_finally, monitored_catch );
     verify_state( d, "Ready" );
     assertEquals( 0, sequence );
-    d.go( monitored_finally, monitored_catch );
+    d.go();
     verify_state( d, "Running" );
     assertEquals( 0, sequence );
   } );
@@ -222,12 +222,12 @@ function simple_abort( factory, queue )
     /* If we monitor the trial by adding to the callback list, it will report the exception as an error, which is not
      * what we want. We indirectly test that it runs by incrementing the sequence number.
      */
-    d = factory( trial );
     var monitored_catch = callbacks.add( catcher );
     var monitored_finally = callbacks.add( finisher );
+    d = factory( trial, monitored_finally, monitored_catch );
     verify_state( d, "Ready" );
     assertEquals( 0, sequence );
-    d.go( monitored_finally, monitored_catch );
+    d.go();
     verify_state( d, "Running" );
     assertEquals( 0, sequence );
     d.abort();
@@ -259,10 +259,10 @@ function simple_value( factory, queue )
     /* If we monitor the trial by adding to the callback list, it will report the exception as an error, which is not
      * what we want. We indirectly test that it runs by incrementing the sequence number.
      */
-    d = factory( trial );
     var monitored_finally = callbacks.add( finisher );
+    d = factory( trial, monitored_finally );
     verify_state( d, "Ready" );
-    d.go( monitored_finally );
+    d.go();
     verify_state( d, "Running" );
   } );
 
@@ -278,11 +278,13 @@ function simple_value( factory, queue )
 /**
  * Factory for Defer objects
  * @param trial
+ * @param finisher
+ * @param catcher
  * @return {Action.Defer}
  */
-function defer_factory( trial )
+function defer_factory( trial, finisher, catcher )
 {
-  return new Action.Defer( trial );
+  return new Action.Defer( trial, finisher, catcher );
 }
 
 ActionTest.prototype.test_defer_try = function( queue )
@@ -318,16 +320,18 @@ ActionTest.prototype.test_simple_value = function( queue )
  * Factory for Delay objects
  * @param delay
  * @param trial
+ * @param finisher
+ * @param catcher
  * @return {Action.Delay}
  */
-function delay_factory( delay, trial )
+function delay_factory( delay, trial, finisher, catcher )
 {
-  return new Action.Delay( trial, delay );
+  return new Action.Delay( trial, delay, finisher, catcher );
 }
 
-function simple_delay_factory( trial )
+function simple_delay_factory( trial, finisher, catcher )
 {
-  return delay_factory( 2, trial );
+  return delay_factory( 2, trial, finisher, catcher );
 }
 
 ActionTest.prototype.test_delay_tries = function( queue )
@@ -392,16 +396,16 @@ Asynchronous_Action__Test.prototype.test_reporting__refencerences_are_absent_upo
   queue.call( "Phase[1]=Go.", function( callbacks )
   {
     // argument[2] is the number of times to expect this function
-    var monitored_trial_function = callbacks.add( null_function, 1, 5000, "defer trial function" );
-    var monitored_finisher_function = callbacks.add( null_function, 2, 5000, "join finisher function" );
-    defer = new Action.Defer( monitored_trial_function );
+    var monitored_trial = callbacks.add( null_function, 1, 5000, "defer trial function" );
+    var monitored_finisher = callbacks.add( null_function, 2, 5000, "join finisher function" );
+    defer = new Action.Defer( monitored_trial );
     reporting_has_watchers( defer, 0 );
-    join1 = new Action.Join( defer );
-    join2 = new Action.Join( defer );
+    join1 = new Action.Join( defer, monitored_finisher );
+    join2 = new Action.Join( defer, monitored_finisher );
     reporting_has_watchers( defer, 0 );
-    join1.go( monitored_finisher_function );
+    join1.go();
     reporting_has_watchers( defer, 1 );
-    join2.go( monitored_finisher_function );
+    join2.go();
     reporting_has_watchers( defer, 2 );
     defer.go();
     verify_state( defer, "Running" );
@@ -443,12 +447,12 @@ Asynchronous_Action__Test.prototype.test_reporting__refencerences_are_absent_aft
   queue.call( "Phase[1]=Go.", function( callbacks )
   {
     // argument[2] is the number of times to expect this function
-    var monitored_finisher_function = callbacks.add( null_function, 1, 5000, "join finisher function" );
+    var monitored_finisher = callbacks.add( null_function, 1, 5000, "join finisher function" );
     defer = new Action.Defer( null_function );
     reporting_has_watchers( defer, 0 );
-    join = new Action.Join( defer );
+    join = new Action.Join( defer, monitored_finisher );
     reporting_has_watchers( defer, 0 );
-    join.go( monitored_finisher_function );
+    join.go();
     reporting_has_watchers( defer, 1 );
     verify_state( defer, "Ready" );
     verify_state( join, "Running" );
@@ -502,12 +506,12 @@ function join_test( variation, factory, queue )
     sequence += 1;
   }
 
-  function joined_catcher()
+  function join_catcher()
   {
     fail( "Joined catcher should not be called." );
   }
 
-  function joined_finisher()
+  function join_finisher()
   {
     // The Join instance should run second.
     verify_state( defer, "Done" );
@@ -516,15 +520,34 @@ function join_test( variation, factory, queue )
     sequence += 2;
   }
 
-  function make_join()
+  /*
+   * The split finisher supports the case where we need to construct a join in one phase but launch it in another.
+   * Because of a monitored function must complete in the same phase in which it set to be monitored, we need a static
+   * function that we can use to initialize and a variable we can initialize in a later phase.
+   */
+  var split_finisher_f;
+
+  function split_finisher()
   {
-    join = factory( defer );
+    if ( !split_finisher_f )
+      throw new Error( "split_finisher_f is not initialized" );
+    split_finisher_f.apply( this, arguments );
+  }
+
+  function monitored_join_finisher( callbacks )
+  {
+    return callbacks.add( join_finisher, null, 2000, "join finisher" );
+  }
+
+  function make_join( finisher )
+  {
+    join = factory( defer, finisher, join_catcher );
     verify_state( join, "Ready" );
   }
 
-  function join_go( callbacks )
+  function join_go()
   {
-    join.go( callbacks.add( joined_finisher, null, 2000, "joined finisher" ), joined_catcher );
+    join.go();
   }
 
   queue.call( "Phase[1]=Go.", function( callbacks )
@@ -540,8 +563,8 @@ function join_test( variation, factory, queue )
         /*
          * Invoke the join before the defer has been invoked. This tests joining to a ready action.
          */
-        make_join();
-        join_go( callbacks );
+        make_join( monitored_join_finisher( callbacks ) );
+        join_go();
         defer.go();
         verify_state( defer, "Running" );
         verify_state( join, "Running" );
@@ -550,9 +573,9 @@ function join_test( variation, factory, queue )
         /*
          * Invoke the join after the defer has been invoked. This tests joining to a running action.
          */
-        make_join();
+        make_join( monitored_join_finisher( callbacks ) );
         defer.go();
-        join_go( callbacks );
+        join_go();
         /*
          * The defer is running, but it hasn't completed yet, so the join hasn't completed yet. Contrast this with
          * the split version, where the defer action has already completed when we invoke the join.
@@ -565,7 +588,7 @@ function join_test( variation, factory, queue )
          * Invoke the defer after the join is invoked, but invoke the join later. This test ensures that the join
          * does not complete prematurely.
          */
-        make_join();
+        make_join( split_finisher );
         defer.go();
         verify_state( defer, "Running" );
         verify_state( join, "Ready" );
@@ -575,8 +598,8 @@ function join_test( variation, factory, queue )
          * Construct the join after defer has already been invoked.
          */
         defer.go();
-        make_join();
-        join_go( callbacks );
+        make_join( monitored_join_finisher( callbacks ) );
+        join_go();
         verify_state( defer, "Running" );
         verify_state( join, "Running" );
         break;
@@ -590,6 +613,7 @@ function join_test( variation, factory, queue )
     switch ( variation )
     {
       case "existing running split":
+        split_finisher_f = monitored_join_finisher( callbacks );
         /*
          * The join should not yet have run at this point.
          */
@@ -598,7 +622,7 @@ function join_test( variation, factory, queue )
         /*
          * We invoke the join on a completed action. As a result, the join will complete immediately.
          */
-        join_go( callbacks );
+        join_go();
         verify_state( defer, "Done" );
         verify_state( join, "Done" );
         break;
@@ -618,42 +642,60 @@ function join_test( variation, factory, queue )
   } );
 }
 
-function join_factory( action )
+//-------------------------------------------------------
+// Join
+//-------------------------------------------------------
+/**
+ * @param action
+ * @param [finisher]
+ * @param [catcher]
+ * @return {Action.Join}
+ */
+function join_factory( action, finisher, catcher )
 {
-  return new Action.Join( action, Array.prototype.slice.call(arguments, 1) );
+  return new Action.Join( action, finisher, catcher );
 }
 
-ActionTest.prototype.test_join__existing_join_to_new_defer_instance = function( queue )
+ActionTest__Join = AsyncTestCase( "Join" );
+
+ActionTest__Join.prototype.test_join__existing_join_to_new_defer_instance = function( queue )
 {
   join_test( "existing ready", join_factory, queue );
 };
 
-ActionTest.prototype.test_join__existing_join_to_running_defer_instance = function( queue )
+ActionTest__Join.prototype.test_join__existing_join_to_running_defer_instance = function( queue )
 {
   join_test( "existing running", join_factory, queue );
 };
 
-ActionTest.prototype.test_join__existing_join_to_running_defer_instance__split = function( queue )
+ActionTest__Join.prototype.test_join__existing_join_to_running_defer_instance__split = function( queue )
 {
   join_test( "existing running split", join_factory, queue );
 };
 
-ActionTest.prototype.test_join__new_join_to_running_defer_instance = function( queue )
+ActionTest__Join.prototype.test_join__new_join_to_running_defer_instance = function( queue )
 {
   join_test( "new running", join_factory, queue )
 };
 
-
-ActionTest__Join_Timeout = AsyncTestCase( "Join_Timeout" );
-
-/*
+//-------------------------------------------------------
+// ActionTest__Join_Timeout
+//-------------------------------------------------------
+/**
  * Join_Timeout factory set at 15 seconds, which should be enough longer than callback limit, set to 2 seconds, to
  * avoid false negatives.
+ *
+ * @param action
+ * @param [finisher]
+ * @param [catcher]
+ * @return {Action.Join_Timeout}
  */
-function join_timeout_factory( action )
+function join_timeout_factory( action, finisher, catcher )
 {
-  return new Action.Join_Timeout( action, 15000 );
+  return new Action.Join_Timeout( action, 15000, finisher, catcher );
 }
+
+ActionTest__Join_Timeout = AsyncTestCase( "Join_Timeout" );
 
 ActionTest__Join_Timeout.prototype.test_join_timeout__existing_join_to_new_defer_instance = function( queue )
 {
@@ -674,7 +716,6 @@ ActionTest__Join_Timeout.prototype.test_join_timeout__new_join_to_running_defer_
 {
   join_test( "new running", join_timeout_factory, queue )
 };
-
 
 ActionTest__Join_Timeout.prototype.test_join_timeout__simple_timeout = function( queue )
 {
@@ -709,9 +750,9 @@ ActionTest__Join_Timeout.prototype.test_join_timeout__simple_timeout = function(
     /*
      * Timeout is set to a very short time.
      */
-    join = new Action.Join_Timeout( defer, 1 );
     var monitored_join_catch = callbacks.add( join_catch, null, 1000, "join catch" );
-    join.go( join_finally, monitored_join_catch );
+    join = new Action.Join_Timeout( defer, 1, join_finally, monitored_join_catch );
+    join.go();
   } );
   /*
    * No need to launch the Defer action. If the timeout doesn't trigger the catcher, the test fails.
