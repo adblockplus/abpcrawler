@@ -42,10 +42,11 @@ var crawler_ui_log = (new Logger( "crawler_ui" )).make_log();
 var current_session = null;
 var preference_service, preference_branch;
 var go_button;
-var base_name, base_name_initial_value;
-var number_of_tabs;
 var input_file, input_file_initial_value;
 var output_directory, output_directory_initial_value;
+var base_name, base_name_initial_value;
+var number_of_tabs;
+var time_limit_units;
 var log_window, progress_message;
 
 function loader()
@@ -91,9 +92,11 @@ function loader()
     var dir = FileUtils.getDir( "Home", [] );
     output_directory.value = dir.path;
   }
-
   document.getElementById( "input_file_icon" ).addEventListener( "click", icon_input_click );
   document.getElementById( "output_directory_icon" ).addEventListener( "click", icon_output_click );
+
+  time_limit_units = document.getElementById( "time_limit_units" );
+  time_limit_units.selectedIndex = 1;
 }
 
 function unloader()
@@ -241,6 +244,7 @@ function start_crawl()
     mainWindow,
     document.getElementById( "leave_open" ).checked,
     document.getElementById( "number_of_tabs" ).value,
+    document.getElementById( "time_limit" ).value * time_limit_units.value,
     function( x )
     {
       progress_message.value = x.active + "/" + x.completed + "/" + x.total;

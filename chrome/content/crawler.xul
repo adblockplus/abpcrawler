@@ -72,9 +72,23 @@
                             <hbox align="center">
                                 <label>Simultaneous Loads</label>
                                 <textbox
-                                        id="number_of_tabs" type="number" min="1" value="5"
+                                        id="number_of_tabs" type="number" min="1" value="12"
                                         width="60"
                                         persist="value"/>
+                            </hbox>
+                            <hbox align="center">
+                                <label>Time Limit per Tab</label>
+                                <textbox
+                                        id="time_limit" type="number" min="1" value="5"
+                                        width="60"
+                                        persist="value"/>
+                                <menulist
+                                        id="time_limit_units">
+                                    <menupopup>
+                                        <menuitem label="seconds" value="1000"/>
+                                        <menuitem label="minutes" value="60000"/>
+                                    </menupopup>
+                                </menulist>
                             </hbox>
                             <checkbox id="leave_open"
                                       label="Leave tabs open"
