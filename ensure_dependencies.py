@@ -89,7 +89,7 @@ class Git():
     subprocess.check_call(["git", "clone", "--quiet", source, target])
 
   def get_revision_id(self, repo, rev="HEAD"):
-    command = ["git", "rev-parse", "--revs-only", rev]
+    command = ["git", "rev-parse", "--revs-only", rev + '^{commit}']
     return subprocess.check_output(command, cwd=repo).strip()
 
   def pull(self, repo):
