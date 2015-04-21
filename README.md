@@ -4,28 +4,26 @@ abpcrawler
 Firefox extension that loads a range of websites and records which
 elements are filtered by [Adblock Plus](http://adblockplus.org).
 
-Building
---------
+Requirements
+------------
 
-Make sure you have:
+* [Python 2.x](https://www.python.org)
+* [The Jinja2 module](http://jinja.pocoo.org/docs)
+* [mozrunner module](https://pypi.python.org/pypi/mozrunner)
 
-* A running Firefox with Adblock Plus and
-  [Extension Auto Installer](https://addons.mozilla.org/en-US/firefox/addon/autoinstaller/)
-  installed
-* Python 2.7
+Running
+-------
 
-Then execute the following:
+Execute the following:
 
-    ./build.py autoinstall 8888
+    ./run.py -b /usr/bin/firefox urls.txt data.json
 
-This will install the extension into the running Firefox, or update it
-if it was already installed.
+This will run the specified Firefox binary to crawl the URLs from `urls.txt`
+(one URL per line). The results will be appended to `data.json`. Firefox will
+close automatically once all URLs have been processed.
 
-Usage
------
-
-Make sure that Adblock Plus is enabled. Click on the ABP symbol in the extension
-bar. In the drop menu, click on the (new) entry _Adblock Plus Crawler_.
+Optionally, you can provide the path to the Adblock Plus repository - Adblock
+Plus will no longer be downloaded then.
 
 License
 -------

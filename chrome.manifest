@@ -1,3 +1,0 @@
-content   abpcrawler chrome/content/
-skin      abpcrawler classic/1.0 chrome/skin/
-locale    abpcrawler {{LOCALE}} chrome/locale/{{LOCALE}}/
