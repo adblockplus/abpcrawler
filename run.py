@@ -58,9 +58,9 @@ def run():
     help='path to the Adblock Plus repository'
   )
   parser.add_argument(
-    '-f', '--filters', type=str, nargs='+',
+    '-f', '--filters', metavar='url', type=str, nargs='+',
     default=["https://easylist-downloads.adblockplus.org/easylist.txt", "https://easylist-downloads.adblockplus.org/exceptionrules.txt"],
-    help='filter lists to install in Adblock Plus'
+    help='filter lists to install in Adblock Plus. The arguments can also have the format path=url, the data will be read from the specified path then.'
   )
   parser.add_argument(
     '-t', '--timeout', type=int, default=300,
@@ -112,10 +112,16 @@ def run():
       print >>handle, '# Adblock Plus preferences'
       print >>handle, 'version=4'
       for url in parameters.filters:
+        if '=' in url:
+          path, url = url.split('=', 1)
+          with open(path, 'r') as source:
+            data = source.read()
+        else:
+          data = urllib.urlopen(url).read()
         print >>handle, '[Subscription]'
-        print >>handle, 'url=%s' %url
+        print >>handle, 'url=%s' % url
         print >>handle, '[Subscription filters]'
-        print >>handle, '\n'.join(urllib.urlopen(url).read().splitlines()[1:])
+        print >>handle, '\n'.join(data.splitlines()[1:])
   finally:
     for path in cleanup:
       os.unlink(path)
