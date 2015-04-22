@@ -16,11 +16,12 @@ Running
 
 Execute the following:
 
-    ./run.py -b /usr/bin/firefox urls.txt data.json
+    ./run.py -b /usr/bin/firefox urls.txt outputdir
 
 This will run the specified Firefox binary to crawl the URLs from `urls.txt`
-(one URL per line). The results will be appended to `data.json`. Firefox will
-close automatically once all URLs have been processed.
+(one URL per line). The resulting data and screenshots will be written to the
+`outputdir` directory. Firefox will close automatically once all URLs have been
+processed.
 
 Optionally, you can provide the path to the Adblock Plus repository - Adblock
 Plus will no longer be downloaded then.
