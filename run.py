@@ -103,21 +103,21 @@ def run():
   )
   parameters = parser.parse_args()
 
-  import buildtools.build
+  import buildtools.packagerGecko as packager
   cleanup = []
   try:
     base_dir = os.path.dirname(__file__)
     handle, crawlerxpi = tempfile.mkstemp(suffix='.xpi')
     os.close(handle)
     cleanup.append(crawlerxpi)
-    buildtools.build.processArgs(base_dir, ['', 'build', '--release', crawlerxpi])
+    packager.createBuild(base_dir, outFile=crawlerxpi, releaseBuild=True)
 
     abpxpi = 'https://addons.mozilla.org/firefox/downloads/latest/1865/addon-1865-latest.xpi'
     if parameters.abpdir:
       handle, abpxpi = tempfile.mkstemp(suffix='.xpi')
       os.close(handle)
       cleanup.append(abpxpi)
-      buildtools.build.processArgs(parameters.abpdir, ['', 'build', '--release', abpxpi])
+      packager.createBuild(parameters.abpdir, outFile=abpxpi, releaseBuild=True)
 
     profile = FirefoxProfile(
       addons=[
