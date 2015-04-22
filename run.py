@@ -173,13 +173,13 @@ def run():
     profile.cleanup()
 
 if __name__ == '__main__':
-  DEPENDENCY_SCRIPT = os.path.join(os.path.dirname(__file__), 'ensure_dependencies.py')
+  BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+  DEPENDENCY_SCRIPT = os.path.join(BASE_DIR, "ensure_dependencies.py")
 
-  if os.path.isfile(DEPENDENCY_SCRIPT):
-    try:
-      subprocess.check_call(['python', DEPENDENCY_SCRIPT])
-    except subprocess.CalledProcessError as e:
-      print >>sys.stderr, e
-      print >>sys.stderr, 'Failed to ensure dependencies being up-to-date!'
+  try:
+    subprocess.check_call([sys.executable, DEPENDENCY_SCRIPT, BASE_DIR])
+  except subprocess.CalledProcessError as e:
+    print >>sys.stderr, e
+    print >>sys.stderr, "Failed to ensure dependencies being up-to-date!"
 
   run()
