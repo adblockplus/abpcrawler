@@ -47,8 +47,9 @@ class CrawlerApp:
       parsedurl = urlparse.urlparse(data['url'])
       urlhash = hashlib.new('md5', data['url']).hexdigest()
       timestamp = datetime.datetime.fromtimestamp(data['startTime'] / 1000.0).strftime('%Y-%m-%dT%H%M%S.%f')
-      filename = "%s-%s-%s.json" % (parsedurl.hostname, timestamp, urlhash)
-      path = os.path.join(self.parameters.outdir, filename)
+      basename = "%s-%s-%s" % (parsedurl.hostname, timestamp, urlhash)
+      datapath = os.path.join(self.parameters.outdir, basename + ".json")
+      screenshotpath = os.path.join(self.parameters.outdir, basename + ".png")
 
       try:
         os.makedirs(self.parameters.outdir)
@@ -56,7 +57,12 @@ class CrawlerApp:
         if e.errno != errno.EEXIST:
           raise
 
-      with io.open(path, 'w', encoding='utf-8') as handle:
+      if "screenshot" in data:
+        with open(screenshotpath, 'wb') as handle:
+          handle.write(urllib.urlopen(data["screenshot"]).read())
+        del data["screenshot"]
+
+      with io.open(datapath, 'w', encoding='utf-8') as handle:
         handle.write(unicode(json.dumps(data, indent=2, ensure_ascii=False, sort_keys=True)) + u'\n')
       start_response('204 No Content', [])
       return ''
