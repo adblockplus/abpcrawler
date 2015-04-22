@@ -2,6 +2,9 @@
 # coding: utf-8
 
 import argparse
+import datetime
+import errno
+import hashlib
 import io
 import json
 import os
@@ -11,6 +14,7 @@ import sys
 import tempfile
 import threading
 import urllib
+import urlparse
 from wsgiref.simple_server import make_server
 
 from mozprofile import FirefoxProfile
@@ -39,7 +43,20 @@ class CrawlerApp:
         return ''
 
       data = json.loads(environ['wsgi.input'].read(request_body_size))
-      with io.open(self.parameters.outfile, 'a', encoding='utf-8') as handle:
+
+      parsedurl = urlparse.urlparse(data['url'])
+      urlhash = hashlib.new('md5', data['url']).hexdigest()
+      timestamp = datetime.datetime.fromtimestamp(data['startTime'] / 1000.0).strftime('%Y-%m-%dT%H%M%S.%f')
+      filename = "%s-%s-%s.json" % (parsedurl.hostname, timestamp, urlhash)
+      path = os.path.join(self.parameters.outdir, filename)
+
+      try:
+        os.makedirs(self.parameters.outdir)
+      except OSError as e:
+        if e.errno != errno.EEXIST:
+          raise
+
+      with io.open(path, 'w', encoding='utf-8') as handle:
         handle.write(unicode(json.dumps(data, indent=2, ensure_ascii=False, sort_keys=True)) + u'\n')
       start_response('204 No Content', [])
       return ''
@@ -75,8 +92,8 @@ def run():
     help='URL list to process'
   )
   parser.add_argument(
-    'outfile', type=str,
-    help='file to write data into'
+    'outdir', type=str,
+    help='directory to write data into'
   )
   parameters = parser.parse_args()
 
