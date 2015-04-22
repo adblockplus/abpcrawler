@@ -103,6 +103,7 @@ def run():
       ],
       preferences={
         'browser.uitour.enabled': False,
+        'prompts.tab_modal.enabled': False,
       }
     )
 
