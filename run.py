@@ -24,17 +24,18 @@ class CrawlerApp:
   server = None
   def __init__(self, parameters):
     self.parameters = parameters
+    with io.open(self.parameters.list, 'r', encoding='utf-8') as handle:
+      self.urls = map(unicode.strip, handle.readlines())
 
   def __call__(self, environ, start_response):
     path = environ.get('PATH_INFO', '')
     if path == '/parameters':
       start_response('200 OK', [('Content-Type', 'application/json')])
-      with io.open(self.parameters.list, 'r', encoding='utf-8') as handle:
-        return [json.dumps({
-          'urls': map(unicode.strip, handle.readlines()),
-          'timeout': self.parameters.timeout * 1000,
-          'maxtabs': self.parameters.maxtabs,
-        })]
+      return [json.dumps({
+        'urls': self.urls,
+        'timeout': self.parameters.timeout * 1000,
+        'maxtabs': self.parameters.maxtabs,
+      })]
     elif path == '/save':
       try:
         request_body_size = int(environ.get('CONTENT_LENGTH', 0))
@@ -43,6 +44,7 @@ class CrawlerApp:
         return ''
 
       data = json.loads(environ['wsgi.input'].read(request_body_size))
+      self.urls.remove(data['url'])
 
       parsedurl = urlparse.urlparse(data['url'])
       urlhash = hashlib.new('md5', data['url']).hexdigest()
@@ -172,8 +174,9 @@ def run():
       cmdargs=['--crawler-port', str(port)],
       env=dict(os.environ, MOZ_CRASHREPORTER_DISABLE='1'),
     )
-    runner.start()
-    runner.wait()
+    while app.urls:
+      runner.start()
+      runner.wait()
   finally:
     if server:
       server.shutdown()
