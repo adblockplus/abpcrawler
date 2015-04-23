@@ -50,6 +50,7 @@ class CrawlerApp:
       basename = "%s-%s-%s" % (parsedurl.hostname, timestamp, urlhash)
       datapath = os.path.join(self.parameters.outdir, basename + ".json")
       screenshotpath = os.path.join(self.parameters.outdir, basename + ".png")
+      sourcepath = os.path.join(self.parameters.outdir, basename + ".xml")
 
       try:
         os.makedirs(self.parameters.outdir)
@@ -61,6 +62,11 @@ class CrawlerApp:
         with open(screenshotpath, 'wb') as handle:
           handle.write(urllib.urlopen(data["screenshot"]).read())
         del data["screenshot"]
+
+      if "source" in data:
+        with io.open(sourcepath, 'w', encoding='utf-8') as handle:
+          handle.write(data["source"])
+        del data["source"]
 
       with io.open(datapath, 'w', encoding='utf-8') as handle:
         handle.write(unicode(json.dumps(data, indent=2, ensure_ascii=False, sort_keys=True)) + u'\n')
