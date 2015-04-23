@@ -169,7 +169,8 @@ def run():
     runner = FirefoxRunner(
       profile=profile,
       binary=parameters.binary,
-      cmdargs=['--crawler-port', str(port)]
+      cmdargs=['--crawler-port', str(port)],
+      env=dict(os.environ, MOZ_CRASHREPORTER_DISABLE='1'),
     )
     runner.start()
     runner.wait()
