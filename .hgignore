@@ -4,5 +4,3 @@ syntax: glob
 *.zip
 *.pyc
 *.sh
-crawl-results
-crawl-source
