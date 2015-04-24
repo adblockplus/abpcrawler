@@ -51,7 +51,7 @@ class CrawlerApp:
       timestamp = datetime.datetime.fromtimestamp(data['startTime'] / 1000.0).strftime('%Y-%m-%dT%H%M%S.%f')
       basename = "%s-%s-%s" % (parsedurl.hostname, timestamp, urlhash)
       datapath = os.path.join(self.parameters.outdir, basename + ".json")
-      screenshotpath = os.path.join(self.parameters.outdir, basename + ".png")
+      screenshotpath = os.path.join(self.parameters.outdir, basename + ".jpg")
       sourcepath = os.path.join(self.parameters.outdir, basename + ".xml")
 
       try:
