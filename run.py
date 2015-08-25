@@ -46,7 +46,8 @@ class CrawlerApp:
       data = json.loads(environ['wsgi.input'].read(request_body_size))
       self.urls.remove(data['url'])
 
-      parsedurl = urlparse.urlparse(data['url'])
+      fullurl = data['url'] if ':' in data['url'] else 'http://' + data['url']
+      parsedurl = urlparse.urlparse(fullurl)
       urlhash = hashlib.new('md5', data['url']).hexdigest()
       timestamp = datetime.datetime.fromtimestamp(data['startTime'] / 1000.0).strftime('%Y-%m-%dT%H%M%S.%f')
       basename = "%s-%s-%s" % (parsedurl.hostname, timestamp, urlhash)
