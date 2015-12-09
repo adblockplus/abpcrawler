@@ -136,6 +136,7 @@ def run():
         abpxpi,
       ],
       preferences={
+        'browser.tabs.warnOnCloseOtherTabs': False,
         'browser.uitour.enabled': False,
         'prompts.tab_modal.enabled': False,
       }
