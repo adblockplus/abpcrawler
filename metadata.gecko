@@ -5,4 +5,4 @@ version=0.1
 author=Felix H. Dahlke
 
 [compat]
-firefox=30.0/46.0
+firefox=30.0/48.0
