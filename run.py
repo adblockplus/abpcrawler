@@ -117,7 +117,7 @@ def run():
   import buildtools.packagerGecko as packager
   cleanup = []
   try:
-    base_dir = os.path.dirname(__file__)
+    base_dir = os.path.dirname(os.path.abspath(__file__))
     handle, crawlerxpi = tempfile.mkstemp(suffix='.xpi')
     os.close(handle)
     cleanup.append(crawlerxpi)
