@@ -7,6 +7,7 @@ elements are filtered by [Adblock Plus](http://adblockplus.org).
 Requirements
 ------------
 
+* [Mercurial](https://www.mercurial-scm.org/) or [Git](https://git-scm.com/) (whichever you used to clone this repository)
 * [Python 2.x](https://www.python.org)
 * [The Jinja2 module](http://jinja.pocoo.org/docs)
 * [mozrunner module](https://pypi.python.org/pypi/mozrunner)
