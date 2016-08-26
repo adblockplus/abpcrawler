@@ -54,9 +54,10 @@ class UrlSizeGetterWorker(Thread):
     def run(self):
         while True:
             url = self.queue.get()
-            if not self.info_dict[url]:
+            count, size = self.info_dict[url]
+            if size == 0:
                 size = get_file_size(url)
-                self.info_dict[url] = size
+                self.info_dict[url] = (count, size)
             self.queue.task_done()
 
 class Analyser:
@@ -66,6 +67,7 @@ class Analyser:
                         'elemhide': {}}
         self.blockurls = {}
         self.totalsize = 0
+        self.totalrequest = 0
 
     def analyse(self):
         self.__walk_dir(self.parameters.outdir, self.__analyse_item)
@@ -93,19 +95,20 @@ class Analyser:
                 print "%s\t%d" %(k, v)
 
         print "\n被阻塞拦截的资源请求:"
-        for url, size in self.blockurls.items():
-            self.totalsize += size
+        for url, (count, size) in self.blockurls.items():
+            self.totalsize += size * count
+            self.totalrequest += count
             type = "script"
             if ".jpg" in url or ".gif" in url or ".png" in url or ".svg" in url \
                 or ".jpeg" in url or ".bmp" in url:
                 type = "image"
             elif ".css" in url or ".woff" in url:
                 type = "style"
-            print "%s\t%d\t%s" %(type, size, url)
+            print "%s\t%d\t%d\t%s" %(type, count, size, url)
 
         print "\n过滤总体情况"
         print "counts: all[%d] blocking[%d] elemhide[%d] savesize[%d]" %(counts['blocking'] + counts['elemhide'],
-                                        counts['blocking'], counts['elemhide'], self.totalsize / len(self.blockurls))
+                                        counts['blocking'], counts['elemhide'], self.totalsize / self.totalrequest)
 
     def __walk_dir(self, dir, function, exclude = ''):
         excludelist = []
@@ -145,7 +148,9 @@ class Analyser:
                 else:
                     count = self.filters['blocking'].get(filter, 0)
                     self.filters['blocking'][filter] = count + 1
-                    self.blockurls[filter_item['location']] = 0
+                    count, size = self.blockurls.get(filter_item['location'], (0, 0))
+                    count += 1
+                    self.blockurls[filter_item['location']] = (count, size)
 
 
 def main():
