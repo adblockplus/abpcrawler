@@ -5,7 +5,12 @@ import argparse
 import os
 import json
 import urllib2
+import time
+import sys
+import psutil
 
+from Queue import Queue
+from threading import Thread
 
 def get_file_size(url, proxy=None):
     """get file size from content-length of heads
@@ -27,19 +32,39 @@ def get_file_size(url, proxy=None):
         response = opener.open(request)
         html = response.read()
     except Exception, e:
-        print '%s %s' % (url, e)
+        print >> sys.stderr, '%s %s' % (url, e)
         return 0
     else:
         #html_size = int(dict(response.headers).get('content-length', 0))
         html_size = len(html)
         return html_size
 
+class UrlSizeGetterWorker(Thread):
+    """
+    The class of image downloading thread
+    Function:
+        __init__():initialization of threading
+        run:the running of threading
+    """
+    def __init__(self, queue, info_dict):
+        Thread.__init__(self)
+        self.queue = queue
+        self.info_dict = info_dict
+
+    def run(self):
+        while True:
+            url = self.queue.get()
+            if not self.info_dict[url]:
+                size = get_file_size(url)
+                self.info_dict[url] = size
+            self.queue.task_done()
+
 class Analyser:
     def __init__(self, parameters):
         self.parameters = parameters
         self.filters = {'blocking': {},
                         'elemhide': {}}
-        self.blockurls = []
+        self.blockurls = {}
         self.totalsize = 0
 
     def analyse(self):
@@ -49,6 +74,18 @@ class Analyser:
         counts = {'blocking': 0,
                   'elemhide': 0}
 
+        queue = Queue()
+        # start cpu core'number double threads
+        for x in range(psutil.cpu_count() * 2):
+            worker = UrlSizeGetterWorker(queue, self.blockurls)
+            worker.setDaemon(True)
+            worker.start()
+        # traverse the links and put the link to queue
+        for url in self.blockurls.keys():
+            queue.put(url)
+        # the new queue joining
+        queue.join()
+
         print "规则匹配命中次数:"
         for filter_type in self.parameters.filter_types:
             for k, v in self.filters[filter_type].items():
@@ -56,8 +93,7 @@ class Analyser:
                 print "%s\t%d" %(k, v)
 
         print "\n被阻塞拦截的资源请求:"
-        for url in self.blockurls:
-            size = get_file_size(url)
+        for url, size in self.blockurls.items():
             self.totalsize += size
             type = "script"
             if ".jpg" in url or ".gif" in url or ".png" in url or ".svg" in url \
@@ -109,7 +145,7 @@ class Analyser:
                 else:
                     count = self.filters['blocking'].get(filter, 0)
                     self.filters['blocking'][filter] = count + 1
-                    self.blockurls.append(filter_item['location'])
+                    self.blockurls[filter_item['location']] = 0
 
 
 def main():
