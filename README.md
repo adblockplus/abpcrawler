@@ -27,6 +27,17 @@ processed.
 Optionally, you can provide the path to the Adblock Plus repository - Adblock
 Plus will no longer be downloaded then.
 
+Analysing
+-------
+
+Execute the following:
+
+    ./analyse.py outputdir > results.txt
+
+This will read the ;outputdir' directory and analyse the results, give a breif
+of the adblock informaition.
+
+
 License
 -------
 

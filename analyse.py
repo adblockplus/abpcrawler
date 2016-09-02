@@ -156,7 +156,7 @@ class Analyser:
 def main():
     parser = argparse.ArgumentParser(description='Analyse results')
     parser.add_argument(
-        '-f', '--filter-types', metavar='url', type=str, nargs='+',
+        '-f', '--filter-types', metavar='type', type=str, nargs='+',
         default=["blocking", "elemhide"],
         help='filter type lists to print results'
     )
