@@ -139,9 +139,12 @@ def run():
                 abpxpi,
             ],
             preferences={
+                'browser.startup.homepage': 'about:blank',
                 'browser.tabs.warnOnCloseOtherTabs': False,
                 'browser.uitour.enabled': False,
                 'prompts.tab_modal.enabled': False,
+                'startup.homepage_welcome_url': 'about:blank',
+                'startup.homepage_welcome_url.additional': 'about:blank',
                 'xpinstall.signatures.required': False,
             }
         )
